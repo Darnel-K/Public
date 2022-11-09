@@ -3,6 +3,7 @@
  * Filename: \Intune\PowerShell Scripts\Disable-LocalAdminAccount.ps1
  * Repository: Public
  * Created Date: Wednesday, November 9th 2022, 9:34:32 AM
+ * Last Modified: Wednesday, November 9th 2022, 2:13:12 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
