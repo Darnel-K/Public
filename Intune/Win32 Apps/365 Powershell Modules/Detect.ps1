@@ -3,6 +3,7 @@
  * Filename: \Intune\Win32 Apps\365 Powershell Modules\Detect.ps1
  * Repository: Public
  * Created Date: Wednesday, November 9th 2022, 10:14:30 AM
+ * Last Modified: Wednesday, November 9th 2022, 2:12:44 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
