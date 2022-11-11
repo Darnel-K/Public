@@ -11,11 +11,13 @@
  * ############################################################################
 #>
 param (
-    [string[]]$OutFile
+    [Parameter()]
+    [string]$OutFile
 )
 function Get-ModuleInstallStatus {
     param (
-        [string[]]$Name
+        [Parameter(Mandatory)]
+        [string]$Name
     )
     $Module = Get-Module -Name $Name -ListAvailable -ErrorAction SilentlyContinue
     if ($Module.count -eq 0) {
