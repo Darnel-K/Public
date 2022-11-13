@@ -3,7 +3,7 @@
  * Filename: \Intune\PowerShell Scripts\Get-AzureAdGuestInfo.ps1
  * Repository: Public
  * Created Date: Friday, November 11th 2022, 12:45:10 PM
- * Last Modified: Friday, November 11th 2022, 5:58:53 PM
+ * Last Modified: Sunday, November 13th 2022, 4:27:00 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -53,17 +53,17 @@ else {
 try {
     Get-AzureADUser -All $true -Filter "UserType eq 'Guest'" -OutVariable AzureADGuests | Out-Null
 
-    $data = foreach ($guest in $AzureADGuests) {
+    [PSCustomObject]$data = foreach ($guest in $AzureADGuests) {
         Select-Object -InputObject $guest -Property ObjectId, ObjectType, AccountEnabled, DisplayName, Mail, UserPrincipalName, @{label = "CreatedDateTime"; expression = { (Get-AzureADUserExtension -ObjectId $_.ObjectId).Get_Item("createdDateTime") } }, UserType -OutVariable FilteredGuest | Out-Null
         [PSCustomObject]@{
-            "ObjectId"          = $FilteredGuest.ObjectID;
-            "ObjectType"        = $FilteredGuest.ObjectType;
-            "AccountEnabled"    = $FilteredGuest.AccountEnabled;
-            "DisplayName"       = $FilteredGuest.DisplayName;
-            "Mail"              = $FilteredGuest.Mail;
-            "UserPrincipalName" = $FilteredGuest.UserPrincipalName;
-            "CreatedDateTime"   = $FilteredGuest.CreatedDateTime;
-            "UserType"          = $FilteredGuest.UserType
+            ObjectId          = $FilteredGuest.ObjectID;
+            ObjectType        = $FilteredGuest.ObjectType;
+            AccountEnabled    = $FilteredGuest.AccountEnabled;
+            DisplayName       = $FilteredGuest.DisplayName;
+            Mail              = $FilteredGuest.Mail;
+            UserPrincipalName = $FilteredGuest.UserPrincipalName;
+            CreatedDateTime   = $FilteredGuest.CreatedDateTime;
+            UserType          = $FilteredGuest.UserType
         }
     }
 }
