@@ -3,7 +3,7 @@
  * Filename: \Intune\PowerShell Scripts\Get-AzureAdGuestInfo.ps1
  * Repository: Public
  * Created Date: Friday, November 11th 2022, 12:45:10 PM
- * Last Modified: Wednesday, November 16th 2022, 10:44:19 AM
+ * Last Modified: Wednesday, November 23rd 2022, 10:10:52 AM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -73,8 +73,8 @@ catch {
 }
 
 try {
-    $ExportPath = "$env:USERPROFILE\Desktop" # Change desktop to something that doesn't exist to force output to console
-    $OneDriveExportPath = "$env:OneDrive\Desktop" # Change desktop to something that doesn't exist to force output to console
+    $ExportPath = "$env:USERPROFILE\Desktop"
+    $OneDriveExportPath = "$env:OneDrive\Desktop"
     $Filename = "$($SessionInfo.TenantDomain) AzureAD Guest Info.csv"
     if (Test-Path -Path $OneDriveExportPath) {
         $data | Export-Csv -Path "$OneDriveExportPath\$Filename" -NoTypeInformation -Force
@@ -85,7 +85,6 @@ try {
         Write-Host "Task Complete... Saved to $ExportPath\$Filename" -ForegroundColor green
     }
     else {
-        # Write-Warning "Cannot find desktop folder... Outputting to console..."
         Write-Output $data
         Exit 1
     }
