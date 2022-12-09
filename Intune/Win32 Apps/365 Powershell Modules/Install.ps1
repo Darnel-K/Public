@@ -3,7 +3,7 @@
  * Filename: \Intune\Win32 Apps\365 Powershell Modules\Install.ps1
  * Repository: Public
  * Created Date: Wednesday, November 9th 2022, 10:14:30 AM
- * Last Modified: Wednesday, November 9th 2022, 2:12:38 PM
+ * Last Modified: Friday, December 9th 2022, 4:34:35 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -18,7 +18,7 @@ Foreach ($Service in $Services) {
             $Module = Get-InstalledModule -Name ExchangeOnlineManagement -MinimumVersion 2.0.3 -ErrorAction SilentlyContinue
             if ($Module.count -eq 0) {
                 Write-Host Exchange Online'(EXO V2)' module is not installed  -ForegroundColor yellow
-                Install-Module ExchangeOnlineManagement -Force
+                Install-Module ExchangeOnlineManagement -Force -Scope AllUsers
             }
             else {
                 Write-Host Exchange Online'(EXO V2)' module is installed  -ForegroundColor green
@@ -29,7 +29,7 @@ Foreach ($Service in $Services) {
             $Module = Get-Module -Name MSOnline -ListAvailable -ErrorAction SilentlyContinue
             if ($Module.count -eq 0) {
                 Write-Host MSOnline module is not installed  -ForegroundColor yellow
-                Install-Module MSOnline -Force
+                Install-Module MSOnline -Force -Scope AllUsers
             }
             else {
                 Write-Host MSOnline module is installed  -ForegroundColor green
@@ -40,7 +40,7 @@ Foreach ($Service in $Services) {
             $Module = Get-Module -Name AzureAD -ListAvailable -ErrorAction SilentlyContinue
             if ($Module.count -eq 0) {
                 Write-Host AzureAD module is not installed  -ForegroundColor yellow
-                Install-Module AzureAD -Force
+                Install-Module AzureAD -Force -Scope AllUsers
             }
             else {
                 Write-Host AzureAD module is installed  -ForegroundColor green
@@ -51,7 +51,7 @@ Foreach ($Service in $Services) {
             $Module = Get-Module -Name Microsoft.Online.SharePoint.PowerShell -ListAvailable -ErrorAction SilentlyContinue
             if ($Module.count -eq 0) {
                 Write-Host SharePoint Online PowerShell module is not installed  -ForegroundColor yellow
-                Install-Module Microsoft.Online.SharePoint.PowerShell -Force
+                Install-Module Microsoft.Online.SharePoint.PowerShell -Force -Scope AllUsers
             }
             else {
                 Write-Host SharePoint Online PowerShell module is installed  -ForegroundColor green
@@ -62,7 +62,7 @@ Foreach ($Service in $Services) {
             $Module = Get-InstalledModule -Name SharePointPnPPowerShellOnline -ErrorAction SilentlyContinue
             if ($Module.count -eq 0) {
                 Write-Host SharePoint PnP module module is not installed  -ForegroundColor yellow
-                Install-Module -Name SharePointPnPPowerShellOnline -AllowClobber -Force
+                Install-Module -Name SharePointPnPPowerShellOnline -AllowClobber -Force -Scope AllUsers
             }
             else {
                 Write-Host SharePoint PnP module module is installed  -ForegroundColor green
@@ -73,7 +73,7 @@ Foreach ($Service in $Services) {
             $Module = Get-InstalledModule -Name ExchangeOnlineManagement -MinimumVersion 2.0.3 -ErrorAction SilentlyContinue
             if ($Module.count -eq 0) {
                 Write-Host Exchange Online'(EXO V2)' module is not installed  -ForegroundColor yellow
-                Install-Module ExchangeOnlineManagement -Force
+                Install-Module ExchangeOnlineManagement -Force -Scope AllUsers
             }
             else {
                 Write-Host Exchange Online'(EXO V2)' module is installed  -ForegroundColor green
@@ -84,7 +84,7 @@ Foreach ($Service in $Services) {
             $Module = Get-InstalledModule -Name MicrosoftTeams -MinimumVersion 4.0.0 -ErrorAction SilentlyContinue
             if ($Module.count -eq 0) {
                 Write-Host MicrosoftTeams module is not installed  -ForegroundColor yellow
-                Install-Module MicrosoftTeams -AllowClobber -Force
+                Install-Module MicrosoftTeams -AllowClobber -Force -Scope AllUsers
             }
             else {
                 Write-Host MicrosoftTeams module is installed  -ForegroundColor green
