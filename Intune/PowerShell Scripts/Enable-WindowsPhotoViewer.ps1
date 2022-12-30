@@ -3,7 +3,7 @@
  * Filename: \Intune\PowerShell Scripts\Enable-WindowsPhotoViewer.ps1
  * Repository: Public
  * Created Date: Friday, December 30th 2022, 5:12:06 PM
- * Last Modified: Friday, December 30th 2022, 5:24:03 PM
+ * Last Modified: Friday, December 30th 2022, 5:30:22 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -12,16 +12,10 @@
 #>
 $RegData = @(
     [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
-        Name  = "verbosestatus"
-        Value = "1"
-        Type  = "DWord"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
-        Name  = "DisableStatusMessages"
-        Value = "0"
-        Type  = "DWord"
+        Path  = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
+        Name  = ".bmp"
+        Value = "PhotoViewer.FileAssoc.BITMAP"
+        Type  = "String"
     }
 )
 
