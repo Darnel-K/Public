@@ -17,6 +17,78 @@ $RegData = @(
         Value = "PhotoViewer.FileAssoc.BITMAP"
         Type  = "String"
     }
+    [PSCustomObject]@{
+        Path = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
+        Name = ".dib"
+        Value = "PhotoViewer.FileAssoc.BITMAP"
+        Type = "String"
+    }
+    [PSCustomObject]@{
+        Path = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
+        Name = ".jpg"
+        Value = "PhotoViewer.FileAssoc.JPEG"
+        Type = "String"
+    }
+    [PSCustomObject]@{
+        Path = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
+        Name = ".jpe"
+        Value = "PhotoViewer.FileAssoc.JPEG"
+        Type = "String"
+    }
+    [PSCustomObject]@{
+        Path = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
+        Name = ".jpeg"
+        Value = "PhotoViewer.FileAssoc.JPEG"
+        Type = "String"
+    }
+    [PSCustomObject]@{
+        Path = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
+        Name = ".jxr"
+        Value = "PhotoViewer.FileAssoc.JPEG"
+        Type = "String"
+    }
+    [PSCustomObject]@{
+        Path = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
+        Name = ".jfif"
+        Value = "PhotoViewer.FileAssoc.JFIF"
+        Type = "String"
+    }
+    [PSCustomObject]@{
+        Path = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
+        Name = ".wdp"
+        Value = "PhotoViewer.FileAssoc.WDP"
+        Type = "String"
+    }
+    [PSCustomObject]@{
+        Path = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
+        Name = ".png"
+        Value = "PhotoViewer.FileAssoc.PNG"
+        Type = "String"
+    }
+    [PSCustomObject]@{
+        Path = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
+        Name = ".gif"
+        Value = "PhotoViewer.FileAssoc.TIFF"
+        Type = "String"
+    }
+    [PSCustomObject]@{
+        Path = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
+        Name = ".tiff"
+        Value = "PhotoViewer.FileAssoc.TIFF"
+        Type = "String"
+    }
+    [PSCustomObject]@{
+        Path = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
+        Name = ".tif"
+        Value = "PhotoViewer.FileAssoc.TIFF"
+        Type = "String"
+    }
+    [PSCustomObject]@{
+        Path = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
+        Name = ""
+        Value = ""
+        Type = ""
+    }
 )
 
 foreach ($i in $RegData) {
