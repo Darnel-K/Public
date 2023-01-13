@@ -1,9 +1,9 @@
 <#
  * ############################################################################
- * Filename: \Intune\PowerShell Scripts\Enable-WindowsPhotoViewer.ps1
+ * Filename: \Intune\Win32 Apps\Windows Photo Viewer\Enable-WindowsPhotoViewer.ps1
  * Repository: Public
  * Created Date: Friday, December 30th 2022, 5:12:06 PM
- * Last Modified: Friday, January 6th 2023, 4:34:56 PM
+ * Last Modified: Friday, January 13th 2023, 3:28:00 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
