@@ -3,7 +3,7 @@
  * Filename: \PowerShell Scripts\Invoke-ListPermissionInheritanceReset.ps1
  * Repository: Public
  * Created Date: Wednesday, January 25th 2023, 11:54:43 AM
- * Last Modified: Wednesday, January 25th 2023, 4:07:51 PM
+ * Last Modified: Wednesday, January 25th 2023, 4:37:55 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -37,7 +37,11 @@ param (
     $OutputPath,
     [Parameter()]
     [switch]
-    $Append = $false
+    $Append = $false,
+    # Parameter help description
+    [Parameter()]
+    [switch]
+    $DisableSharingForNonOwners = $false
 )
 
 # Import PnP Module
@@ -60,11 +64,30 @@ catch {
     Exit 1
 }
 
+# Disable Sharing For Non Owners
+if ($DisableSharingForNonOwners) {
+    try {
+        Write-Host "Disabling Sharing For Non Owners" -ForegroundColor Yellow
+        Set-PnPSite -Identity $Url -DisableSharingForNonOwners
+        Write-Host "Disabled Sharing For Non Owners" -ForegroundColor Green
+    }
+    catch {
+        Write-Warning "Unable to disable Sharing For Non Owners. Disable manually from the WebUI."
+    }
+}
+
 $ctx = Get-PnPContext
 
 Write-Host "Looking for item(s)... Please wait..."
 # Get all items in document library
-$items = Get-PnPListItem -List $ListName -PageSize 5000
+try {
+    $items = Get-PnPListItem -List $ListName -PageSize 5000
+}
+catch {
+    Write-Warning "Unable to get items from '$ListName'..."
+    Write-Warning $Error[0]
+    Exit 1
+}
 Write-Host "Found $($items.Count) Item(s)"
 
 $i = 0
