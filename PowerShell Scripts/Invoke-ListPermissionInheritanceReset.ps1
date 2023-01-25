@@ -3,7 +3,7 @@
  * Filename: \PowerShell Scripts\Invoke-ListPermissionInheritanceReset.ps1
  * Repository: Public
  * Created Date: Wednesday, January 25th 2023, 11:54:43 AM
- * Last Modified: Wednesday, January 25th 2023, 4:37:55 PM
+ * Last Modified: Wednesday, January 25th 2023, 5:14:35 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -75,6 +75,17 @@ if ($DisableSharingForNonOwners) {
         Write-Warning "Unable to disable Sharing For Non Owners. Disable manually from the WebUI."
     }
 }
+
+# Reset library permissions
+try {
+    Write-Host "Enabling inheritance for '$ListName'" -ForegroundColor Yellow
+    Set-PnPList -Identity $ListName -ResetRoleInheritance | Out-Null
+    Write-Host "Enabled inheritance for '$ListName'" -ForegroundColor Green
+}
+catch {
+    Write-Warning "Unable to enable inheritance for '$ListName'. Enable manually from the WebUI."
+}
+
 
 $ctx = Get-PnPContext
 
