@@ -3,7 +3,7 @@
  * Filename: \Intune\Win32 Apps\365 Powershell Modules\Uninstall.ps1
  * Repository: Public
  * Created Date: Tuesday, January 31st 2023, 10:32:14 AM
- * Last Modified: Tuesday, January 31st 2023, 11:55:07 AM
+ * Last Modified: Tuesday, January 31st 2023, 2:46:22 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -17,7 +17,7 @@ foreach ($item in $PSModules) {
     if ($Installed) {
         Write-Host "[ INSTALLED ] - $item" -ForegroundColor Red
         Write-Host "[UNINSTALLING] - $item" -ForegroundColor Yellow
-        Uninstall-Module -Name $item -Force
+        Uninstall-Module -Name $item -Force -Confirm:$false -Verbose:$false
         if ((Get-InstalledModule -Name $item -ErrorAction SilentlyContinue)) {
             Write-Host "[  FAILED  ] - $item" -ForegroundColor Red
             Exit 1
