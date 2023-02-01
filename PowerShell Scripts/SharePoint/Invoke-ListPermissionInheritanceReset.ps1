@@ -3,7 +3,7 @@
  * Filename: \PowerShell Scripts\SharePoint\Invoke-ListPermissionInheritanceReset.ps1
  * Repository: Public
  * Created Date: Wednesday, January 25th 2023, 11:54:43 AM
- * Last Modified: Wednesday, February 1st 2023, 8:54:25 AM
+ * Last Modified: Wednesday, February 1st 2023, 5:20:27 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -149,7 +149,7 @@ if ($OutputPath) {
         $OutputPath = "$OutputPath\SharepointItemsUniquePermissions.csv"
         try {
             Write-Host -f Green "Exporting results to '$OutputPath'"
-            if ($Append) {
+            if ($Append.IsPresent) {
                 $resetItems | Export-Csv -Path $OutputPath -NoTypeInformation -Append
             }
             else {
