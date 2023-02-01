@@ -3,7 +3,7 @@
  * Filename: \Intune\Win32 Apps\365 Powershell Modules\Install.ps1
  * Repository: Public
  * Created Date: Tuesday, January 31st 2023, 10:32:14 AM
- * Last Modified: Wednesday, February 1st 2023, 9:25:53 AM
+ * Last Modified: Wednesday, February 1st 2023, 10:04:17 AM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -19,7 +19,7 @@ if ((Get-PackageProvider -Name NuGet)) {
 else {
     Write-Host "[ MISSING ] - NuGet" -ForegroundColor Red
     Write-Host "[INSTALLING] - NuGet" -ForegroundColor Yellow
-    Install-PackageProvider -Name NuGet -Force -Scope CurrentUser -Confirm:$false
+    Install-PackageProvider -Name NuGet -Scope CurrentUser -Confirm:$false -Force -ForceBootstrap
     if ((Get-PackageProvider -Name NuGet)) {
         Write-Host "[INSTALLED] - NuGet" -ForegroundColor Green
     }
