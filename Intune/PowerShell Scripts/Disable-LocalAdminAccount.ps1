@@ -3,7 +3,7 @@
  * Filename: \Intune\PowerShell Scripts\Disable-LocalAdminAccount.ps1
  * Repository: Public
  * Created Date: Wednesday, November 9th 2022, 9:34:32 AM
- * Last Modified: Wednesday, January 11th 2023, 12:55:59 PM
+ * Last Modified: Wednesday, February 1st 2023, 1:51:19 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -13,9 +13,8 @@
 $User = "Administrator"
 try {
     # Check if $User is enabled
-    $Result = (Get-LocalUser -Name $user -ErrorAction Stop).Enabled
     try {
-        if ($Result) {
+        if ((Get-LocalUser -Name $user -ErrorAction Stop).Enabled) {
             # Attempt to disable $User
             Disable-LocalUser -Name $User
             Write-Host "User: $User, is disabled."
