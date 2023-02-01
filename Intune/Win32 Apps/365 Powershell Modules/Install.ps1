@@ -3,14 +3,14 @@
  * Filename: \Intune\Win32 Apps\365 Powershell Modules\Install.ps1
  * Repository: Public
  * Created Date: Tuesday, January 31st 2023, 10:32:14 AM
- * Last Modified: Tuesday, January 31st 2023, 3:54:29 PM
+ * Last Modified: Wednesday, February 1st 2023, 9:25:53 AM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
  * Copyright (c) 2023 Darnel Kumar
  * ############################################################################
 #>
-Start-Transcript -Path "C:\MS365PowerShellModules.log" -Force
+Start-Transcript -Path "$env:USERPROFILE\Logs\Install365PowerShellModules.Intune.log" -Force
 $PSModules = @("PnP.PowerShell", "AzureADPreview", "ExchangeOnlineManagement", "Microsoft.Online.SharePoint.PowerShell", "MicrosoftTeams")
 # Check for NuGet package provider
 if ((Get-PackageProvider -Name NuGet)) {
@@ -19,7 +19,7 @@ if ((Get-PackageProvider -Name NuGet)) {
 else {
     Write-Host "[ MISSING ] - NuGet" -ForegroundColor Red
     Write-Host "[INSTALLING] - NuGet" -ForegroundColor Yellow
-    Install-PackageProvider -Name NuGet -Force -Scope AllUsers -Confirm:$false
+    Install-PackageProvider -Name NuGet -Force -Scope CurrentUser -Confirm:$false
     if ((Get-PackageProvider -Name NuGet)) {
         Write-Host "[INSTALLED] - NuGet" -ForegroundColor Green
     }
@@ -37,7 +37,7 @@ foreach ($item in $PSModules) {
     else {
         Write-Host "[ MISSING ] - $item" -ForegroundColor Red
         Write-Host "[INSTALLING] - $item" -ForegroundColor Yellow
-        Install-Module -Name $item -Scope AllUsers -Force -Confirm:$false -AllowClobber
+        Install-Module -Name $item -Scope CurrentUser -Force -Confirm:$false -AllowClobber
         if ((Get-InstalledModule -Name $item -ErrorAction SilentlyContinue)) {
             Write-Host "[INSTALLED] - $item" -ForegroundColor Green
         }
