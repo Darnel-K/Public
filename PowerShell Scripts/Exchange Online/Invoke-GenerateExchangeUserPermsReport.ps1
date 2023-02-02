@@ -3,7 +3,7 @@
  * Filename: \PowerShell Scripts\Exchange Online\Invoke-GenerateExchangeUserPermsReport.ps1
  * Repository: Public
  * Created Date: Wednesday, February 1st 2023, 3:35:18 PM
- * Last Modified: Thursday, February 2nd 2023, 4:16:22 PM
+ * Last Modified: Thursday, February 2nd 2023, 4:19:09 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -45,7 +45,7 @@ try {
     }
     elseif ($Identity -and $Trustee) {
         Write-Host "Please wait, retrieving mailboxes from server..."
-        $Mailboxes = Get-Mailbox -ResultSize Unlimited -Identity $Identity
+        $Mailboxes += Get-Mailbox -ResultSize Unlimited -Identity $Identity
         $TrusteeDisplayName = (Get-Mailbox -Identity $Trustee).DisplayName
     }
     else {
