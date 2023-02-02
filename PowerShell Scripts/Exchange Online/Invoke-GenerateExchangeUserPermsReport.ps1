@@ -3,7 +3,7 @@
  * Filename: \PowerShell Scripts\Exchange Online\Invoke-GenerateExchangeUserPermsReport.ps1
  * Repository: Public
  * Created Date: Wednesday, February 1st 2023, 3:35:18 PM
- * Last Modified: Thursday, February 2nd 2023, 4:28:38 PM
+ * Last Modified: Thursday, February 2nd 2023, 4:51:40 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -79,14 +79,14 @@ foreach ($item in $Mailboxes) {
     }
 
 
-    if ($rp -ne $null) {
+    if ($null -ne $rp) {
         $Results += [PSCustomObject]@{
             Identity     = $item.UserPrincipalName
             Trustee      = $rp.Trustee
             AccessRights = $rp.AccessRights
         }
     }
-    if ($mp -ne $null) {
+    if ($null -ne $mp) {
         $Results += [PSCustomObject]@{
             Identity     = $item.UserPrincipalName
             Trustee      = $mp.User
