@@ -3,7 +3,7 @@
  * Filename: \PowerShell Scripts\Exchange Online\Invoke-GenerateExchangeUserPermsReport.ps1
  * Repository: Public
  * Created Date: Wednesday, February 1st 2023, 3:35:18 PM
- * Last Modified: Thursday, February 2nd 2023, 4:19:09 PM
+ * Last Modified: Thursday, February 2nd 2023, 4:28:38 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -23,29 +23,20 @@ $ProgressPreference = "Continue"
 $Mailboxes = @()
 $Results = @()
 
-try {
-    Connect-ExchangeOnline
-}
-catch {
-    Write-Warning "Unable to connect to Exchange Online..."
-    Write-Warning $Error[0]
-    Exit 1
-}
-
 # Get mailboxes from Exchange
 try {
-    if ($Identity -and -not $Trustee) {
+    if (($Identity -and -not $Trustee) -or ($Identity -and $Trustee)) {
+        Connect-ExchangeOnline
         Write-Host "Please wait, retrieving mailboxes from server..."
         $Mailboxes += Get-Mailbox -ResultSize Unlimited -Identity $Identity
+        if ($Identity -and $Trustee) {
+            $TrusteeDisplayName = (Get-Mailbox -Identity $Trustee).DisplayName
+        }
     }
     elseif ($Trustee -and -not $Identity) {
+        Connect-ExchangeOnline
         Write-Host "Please wait, retrieving mailboxes from server..."
         $Mailboxes = Get-Mailbox -ResultSize Unlimited
-        $TrusteeDisplayName = (Get-Mailbox -Identity $Trustee).DisplayName
-    }
-    elseif ($Identity -and $Trustee) {
-        Write-Host "Please wait, retrieving mailboxes from server..."
-        $Mailboxes += Get-Mailbox -ResultSize Unlimited -Identity $Identity
         $TrusteeDisplayName = (Get-Mailbox -Identity $Trustee).DisplayName
     }
     else {
