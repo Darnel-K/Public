@@ -3,17 +3,18 @@
  * Filename: \Intune\PowerShell Scripts\Invoke-SetRegionUK.ps1
  * Repository: Public
  * Created Date: Friday, March 10th 2023, 4:23:48 PM
- * Last Modified: Friday, March 10th 2023, 5:34:17 PM
+ * Last Modified: Friday, March 10th 2023, 5:35:31 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
  * Copyright (c) 2023 Darnel Kumar
  * ############################################################################
 #>
-$LanguageFeatures = (Get-InstalledLanguage -Language en-GB).LanguageFeatures
+$DesiredLanguage = "en-GB"
+$LanguageFeatures = (Get-InstalledLanguage -Language $DesiredLanguage).LanguageFeatures
 if (($null -eq $LanguageFeatures) -or ($LanguageFeatures -eq "None")) {
     try {
-        Install-Language 'en-GB' -CopyToSettings
+        Install-Language $DesiredLanguage -CopyToSettings
     }
     catch {
         Write-Warning $Error[0]
@@ -21,16 +22,16 @@ if (($null -eq $LanguageFeatures) -or ($LanguageFeatures -eq "None")) {
 
 }
 
-if (Get-SystemPreferredUILanguage -ne "en-GB") {
+if (Get-SystemPreferredUILanguage -ne $DesiredLanguage) {
     try {
-        Set-SystemPreferredUILanguage en-GB
+        Set-SystemPreferredUILanguage $DesiredLanguage
     }
     catch {
         Write-Warning $Error[0]
     }
 }
 
-Set-Culture 'en-GB'
+Set-Culture $DesiredLanguage
 $culture = Get-Culture
 
 $culture.DateTimeFormat.FirstDayOfWeek = 'Monday'
@@ -44,4 +45,4 @@ Set-Culture $culture
 
 Set-WinHomeLocation -GeoId 242
 
-Set-WinSystemLocale -SystemLocale 'en-GB'
+Set-WinSystemLocale -SystemLocale $DesiredLanguage
