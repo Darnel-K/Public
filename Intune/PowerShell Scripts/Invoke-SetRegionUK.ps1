@@ -3,7 +3,7 @@
  * Filename: \Intune\PowerShell Scripts\Invoke-SetRegionUK.ps1
  * Repository: Public
  * Created Date: Friday, March 10th 2023, 4:23:48 PM
- * Last Modified: Friday, March 10th 2023, 5:35:31 PM
+ * Last Modified: Friday, March 10th 2023, 5:37:11 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -31,7 +31,13 @@ if (Get-SystemPreferredUILanguage -ne $DesiredLanguage) {
     }
 }
 
-Set-Culture $DesiredLanguage
+try {
+    Set-Culture $DesiredLanguage
+}
+catch {
+    Write-Warning $Error[0]
+}
+
 $culture = Get-Culture
 
 $culture.DateTimeFormat.FirstDayOfWeek = 'Monday'
@@ -41,8 +47,21 @@ $culture.DateTimeFormat.LongTimePattern = 'hh:mm:ss tt'
 $culture.DateTimeFormat.ShortDatePattern = 'yyyy-MM-dd'
 $culture.DateTimeFormat.ShortTimePattern = 'hh:mm tt'
 
-Set-Culture $culture
-
-Set-WinHomeLocation -GeoId 242
-
-Set-WinSystemLocale -SystemLocale $DesiredLanguage
+try {
+    Set-Culture $culture
+}
+catch {
+    Write-Warning $Error[0]
+}
+try {
+    Set-WinHomeLocation -GeoId 242
+}
+catch {
+    Write-Warning $Error[0]
+}
+try {
+    Set-WinSystemLocale -SystemLocale $DesiredLanguage
+}
+catch {
+    Write-Warning $Error[0]
+}
