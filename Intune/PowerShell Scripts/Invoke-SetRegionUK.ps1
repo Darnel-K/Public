@@ -3,7 +3,7 @@
  * Filename: \Intune\PowerShell Scripts\Invoke-SetRegionUK.ps1
  * Repository: Public
  * Created Date: Friday, March 10th 2023, 4:23:48 PM
- * Last Modified: Friday, March 10th 2023, 5:47:57 PM
+ * Last Modified: Saturday, March 11th 2023, 7:11:41 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -13,6 +13,7 @@
 
 # https://superuser.com/questions/1579847/what-do-i-have-to-specify-to-make-set-culture-set-a-default-of-24-hours-rather-t
 # https://stackoverflow.com/questions/28749439/changing-windows-time-and-date-format
+# https://github.com/okieselbach/Intune/blob/master/Win32/SetLanguage-de-DE/Install-LanguageExperiencePack.ps1
 $DesiredLanguage = "en-GB"
 $LanguageFeatures = (Get-InstalledLanguage -Language $DesiredLanguage).LanguageFeatures
 if (($null -eq $LanguageFeatures) -or ($LanguageFeatures -eq "None")) {
