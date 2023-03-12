@@ -3,7 +3,7 @@
  * Filename: \Intune\Win32 Apps\Bitwarden\install.ps1
  * Repository: Public
  * Created Date: Sunday, March 12th 2023, 2:18:06 PM
- * Last Modified: Sunday, March 12th 2023, 3:33:14 PM
+ * Last Modified: Sunday, March 12th 2023, 3:34:07 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -18,7 +18,7 @@
 .NOTES
     Information or caveats about the function e.g. 'This function is not supported in Linux'
 .LINK
-    Specify a URI to a help page, this will show when Get-Help -Online is used.
+    https://github.com/Darnel-K/Public/blob/e726ef69f6c422664a8b2e74878f380b68839024/Intune/Win32 Apps/Bitwarden/README.md#L1
 .EXAMPLE
     Test-MyTestFunction -Verbose
     Explanation of the function or its result. You can include multiple examples with additional .EXAMPLE lines
