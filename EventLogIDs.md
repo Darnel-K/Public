@@ -1,3 +1,3 @@
 # List of Event ID Usages
 
-- 1: Informational Message
+- 0: Generic Message
