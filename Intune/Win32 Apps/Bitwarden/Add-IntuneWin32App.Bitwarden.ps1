@@ -3,7 +3,7 @@
  * Filename: \Intune\Win32 Apps\Bitwarden\Add-IntuneWin32App.Bitwarden.ps1
  * Repository: Public
  * Created Date: Sunday, March 12th 2023, 2:18:06 PM
- * Last Modified: Sunday, March 12th 2023, 4:33:55 PM
+ * Last Modified: Sunday, March 12th 2023, 4:37:27 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -25,7 +25,7 @@
 
 begin {
     # Update LogName and LogSource
-    $LogName = "ABYSS.ORG.UK"; $LogSource = "TestApp";
+    $LogName = "ABYSS.ORG.UK"; $LogSource = ".Intune.Win32App.Bitwarden";
     if (-not ([System.Diagnostics.EventLog]::Exists($LogName)) -or -not ([System.Diagnostics.EventLog]::SourceExists($LogSource))) {
         New-EventLog -LogName $LogName -Source $LogSource
         Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Initialised Event Log: $LogSource" -EventId 0
