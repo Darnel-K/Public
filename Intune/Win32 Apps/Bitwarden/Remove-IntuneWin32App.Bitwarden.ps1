@@ -10,6 +10,7 @@
  * Copyright (c) 2023 Darnel Kumar
  * ############################################################################
 #>
+
 <#
 .SYNOPSIS
     Uninstalls Bitwarden
