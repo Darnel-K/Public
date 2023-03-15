@@ -28,8 +28,16 @@ begin {
     # Update LogName and LogSource
     $LogName = "ABYSS.ORG.UK"; $LogSource = ".Intune.Win32App.Bitwarden";
     if (-not ([System.Diagnostics.EventLog]::Exists($LogName)) -or -not ([System.Diagnostics.EventLog]::SourceExists($LogSource))) {
-        New-EventLog -LogName $LogName -Source $LogSource
-        Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Initialised Event Log: $LogSource" -EventId 0
+        try {
+            New-EventLog -LogName $LogName -Source $LogSource
+            Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Initialised Event Log: $LogSource" -EventId 1
+        }
+        catch {
+            $Message = "Unable to initialise event log '$LogName' with source '$LogSource', falling back to event log 'Application' with source 'Application'"
+            $LogName = "Application"; $LogSource = "Application"; # DO NOT CHANGE
+            Write-EventLog -LogName $LogName -Source $LogSource -EntryType Error -Message $Message -EventId 1000
+            Write-EventLog -LogName $LogName -Source $LogSource -EntryType Error -Message $Error[0] -EventId 1000
+        }
     }
     if (Test-Path "$env:ProgramFiles\Bitwarden\Bitwarden.exe" -PathType Leaf) {
         Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Bitwarden already installed" -EventId 0
