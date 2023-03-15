@@ -3,7 +3,7 @@
  * Filename: \PowerShell Scripts\Template.ps1
  * Repository: Public
  * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Wednesday, March 15th 2023, 4:21:14 PM
+ * Last Modified: Wednesday, March 15th 2023, 4:42:53 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -54,8 +54,8 @@ begin {
         catch {
             $Message = "Unable to initialise event log '$LogName' with source '$LogSource', falling back to event log 'Application' with source 'Application'"
             $LogName = "Application"; $LogSource = "Application"; # DO NOT CHANGE
-            Write-EventLog -LogName $LogName -Source $LogSource -EntryType Error -Message $Message -EventId 1000
-            Write-EventLog -LogName $LogName -Source $LogSource -EntryType Error -Message $Error[0] -EventId 1000
+            Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message $Message -EventId 1000
+            Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message $Error[0] -EventId 1000
         }
     }
     # Add any code here that needs be done once during the initialisation phase
