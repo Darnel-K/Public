@@ -3,7 +3,7 @@
  * Filename: \PowerShell Scripts\Exchange Online\Get-ExchangeMailboxDelegation.ps1
  * Repository: Public
  * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Wednesday, March 22nd 2023, 2:06:01 PM
+ * Last Modified: Wednesday, March 22nd 2023, 2:25:47 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -159,6 +159,7 @@ process {
             }
             if ($null -ne $rp) {
                 $Results += [PSCustomObject]@{
+                    ExchangeGUID = $item.ExchangeGUID
                     Identity     = $item.UserPrincipalName
                     Trustee      = $rp.Trustee
                     AccessRights = $rp.AccessRights
@@ -166,6 +167,7 @@ process {
             }
             if ($null -ne $mp) {
                 $Results += [PSCustomObject]@{
+                    ExchangeGUID = $item.ExchangeGUID
                     Identity     = $item.UserPrincipalName
                     Trustee      = $mp.User
                     AccessRights = $mp.AccessRights
