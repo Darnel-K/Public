@@ -3,7 +3,7 @@
  * Filename: \PowerShell Scripts\Exchange Online\Get-ExchangeMailboxDelegation.ps1
  * Repository: Public
  * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Wednesday, March 22nd 2023, 1:58:52 PM
+ * Last Modified: Wednesday, March 22nd 2023, 2:02:42 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -139,60 +139,58 @@ process {
             $i++
             $PercentComplete = ($i / $Mailboxes.count) * 100
             Write-Progress -Id 0 -Activity "Checking Mailbox Permissions" -Status "$([math]::Round($PercentComplete))% Complete" -PercentComplete $PercentComplete -CurrentOperation "Checking Mailbox: $($item.UserPrincipalName)"
+            # Generate progress bar
+            $i++
+            $PercentComplete = ($i / $Mailboxes.count) * 100
+            Write-Progress -Id 0 -Activity "Checking Mailbox Permissions" -Status "$([math]::Round($PercentComplete))% Complete" -PercentComplete $PercentComplete -CurrentOperation "Checking Mailbox: $($item.UserPrincipalName)"
+            try {
+                if ($Identity -and -not $Trustee) {
+                    $rp = Get-RecipientPermission -Identity $item.ExchangeGUID
+                    $mp = Get-MailboxPermission -Identity $item.ExchangeGUID
+                }
+                elseif (($Trustee -and -not $Identity) -or ($Identity -and $Trustee)) {
+                    $rp = Get-RecipientPermission -Identity $item.ExchangeGUID -Trustee $Trustee
+                    $mp = Get-MailboxPermission -Identity $item.ExchangeGUID -User $Trustee
+                }
+                else {
+                    Write-Error "-Identity or -Trustee parameter not specified, one or both of these parameters must be specified."
+                    Exit 1
+                }
+            }
+            catch {
+                Write-Warning "Failed checking '$($item.UserPrincipalName)' permissions"
+                Write-Warning $Error[0]
+            }
+            if ($null -ne $rp) {
+                $Results += [PSCustomObject]@{
+                    Identity     = $item.UserPrincipalName
+                    Trustee      = $rp.Trustee
+                    AccessRights = $rp.AccessRights
+                }
+            }
+            if ($null -ne $mp) {
+                $Results += [PSCustomObject]@{
+                    Identity     = $item.UserPrincipalName
+                    Trustee      = $mp.User
+                    AccessRights = $mp.AccessRights
+                }
+            }
+            if ( $Trustee -and ($TrusteeDisplayName -in $item.GrantSendOnBehalfTo)) {
+                $Results += [PSCustomObject]@{
+                    Identity     = $item.UserPrincipalName
+                    Trustee      = $item.GrantSendOnBehalfTo
+                    AccessRights = "SendOnBehalf"
+                }
+            }
+            elseif (!($Trustee) -and $item.GrantSendOnBehalfTo) {
+                $Results += [PSCustomObject]@{
+                    Identity     = $item.UserPrincipalName
+                    Trustee      = $item.GrantSendOnBehalfTo
+                    AccessRights = "SendOnBehalf"
+                }
+            }
         }
-        # foreach ($item in $Mailboxes) {
-        #     # Generate progress bar
-        #     $i++
-        #     $PercentComplete = ($i / $Mailboxes.count) * 100
-        #     Write-Progress -Id 0 -Activity "Checking Mailbox Permissions" -Status "$([math]::Round($PercentComplete))% Complete" -PercentComplete $PercentComplete -CurrentOperation "Checking Mailbox: $($item.UserPrincipalName)"
-        #     try {
-        #         if ($Identity -and -not $Trustee) {
-        #             $rp = Get-RecipientPermission -Identity $item.ExchangeGUID
-        #             $mp = Get-MailboxPermission -Identity $item.ExchangeGUID
-        #         }
-        #         elseif (($Trustee -and -not $Identity) -or ($Identity -and $Trustee)) {
-        #             $rp = Get-RecipientPermission -Identity $item.ExchangeGUID -Trustee $Trustee
-        #             $mp = Get-MailboxPermission -Identity $item.ExchangeGUID -User $Trustee
-        #         }
-        #         else {
-        #             Write-Error "-Identity or -Trustee parameter not specified, one or both of these parameters must be specified."
-        #             Exit 1
-        #         }
-        #     }
-        #     catch {
-        #         Write-Warning "Failed checking '$($item.UserPrincipalName)' permissions"
-        #         Write-Warning $Error[0]
-        #     }
-        #     if ($null -ne $rp) {
-        #         $Results += [PSCustomObject]@{
-        #             Identity     = $item.UserPrincipalName
-        #             Trustee      = $rp.Trustee
-        #             AccessRights = $rp.AccessRights
-        #         }
-        #     }
-        #     if ($null -ne $mp) {
-        #         $Results += [PSCustomObject]@{
-        #             Identity     = $item.UserPrincipalName
-        #             Trustee      = $mp.User
-        #             AccessRights = $mp.AccessRights
-        #         }
-        #     }
-        #     if ( $Trustee -and ($TrusteeDisplayName -in $item.GrantSendOnBehalfTo)) {
-        #         $Results += [PSCustomObject]@{
-        #             Identity     = $item.UserPrincipalName
-        #             Trustee      = $item.GrantSendOnBehalfTo
-        #             AccessRights = "SendOnBehalf"
-        #         }
-        #     }
-        #     elseif (!($Trustee) -and $item.GrantSendOnBehalfTo) {
-        #         $Results += [PSCustomObject]@{
-        #             Identity     = $item.UserPrincipalName
-        #             Trustee      = $item.GrantSendOnBehalfTo
-        #             AccessRights = "SendOnBehalf"
-        #         }
-        #     }
-        # }
-        # Write-Host "Completed Permissions Check" -ForegroundColor Green
+        Write-Host "Completed Permissions Check" -ForegroundColor Green
     }
     if ($DistGroups.Count -gt 0) {
         Write-Host $DistGroups.Count
