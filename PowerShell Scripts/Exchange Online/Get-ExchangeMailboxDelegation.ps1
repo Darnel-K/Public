@@ -3,7 +3,7 @@
  * Filename: \PowerShell Scripts\Exchange Online\Get-ExchangeMailboxDelegation.ps1
  * Repository: Public
  * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Wednesday, March 22nd 2023, 11:07:37 AM
+ * Last Modified: Wednesday, March 22nd 2023, 11:08:46 AM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -167,5 +167,34 @@ process {
 }
 
 end {
+    Disconnect-ExchangeOnline
+    #Export the Data to CSV file
+    if ($OutputPath) {
+        if ( Test-Path $OutputPath ) {
+            $OutputPath = "$OutputPath\ExchangeMailboxPermissions.csv"
+            try {
+                Write-Host -f Green "Exporting results to '$OutputPath'"
+                if ($Append.IsPresent) {
+                    $Results | Export-Csv -Path $OutputPath -NoTypeInformation -Append
+                }
+                else {
+                    $Results | Export-Csv -Path $OutputPath -NoTypeInformation
+                }
+            }
+            catch {
+                Write-Warning "Failed to export results to '$OutputPath'"
+                Write-Verbose $Error[0]
+                Write-Warning "Outputting to console..."
+                Write-Output $Results
+            }
+        }
+        else {
+            Write-Warning "'$OutputPath' Does not exist, outputting to console"
+            Write-Output $Results
+        }
+    }
+    else {
+        Write-Output $Results
+    }
 
 }
