@@ -3,7 +3,7 @@
  * Filename: \PowerShell Scripts\Exchange Online\Get-ExchangeMailboxDelegation.ps1
  * Repository: Public
  * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Wednesday, March 22nd 2023, 2:25:47 PM
+ * Last Modified: Wednesday, March 22nd 2023, 3:56:14 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -158,23 +158,36 @@ process {
                 Write-Warning $Error[0]
             }
             if ($null -ne $rp) {
-                $Results += [PSCustomObject]@{
-                    ExchangeGUID = $item.ExchangeGUID
-                    Identity     = $item.UserPrincipalName
-                    Trustee      = $rp.Trustee
-                    AccessRights = $rp.AccessRights
+                foreach ($rpItem in $rp) {
+                    $tguid = $null
+                    if (-not ($rpItem.Trustee -eq "NT AUTHORITY\SELF")) { $tguid = (Get-Mailbox -Identity $rpItem.Trustee ).ExchangeGUID }
+                    $Results += [PSCustomObject]@{
+                        ExchangeGUID        = $item.ExchangeGUID
+                        Identity            = $item.UserPrincipalName
+                        Trustee             = $rpItem.Trustee
+                        TrusteeExchangeGUID = $tguid
+                        AccessRights        = $rpItem.AccessRights
+                    }
                 }
+
             }
             if ($null -ne $mp) {
-                $Results += [PSCustomObject]@{
-                    ExchangeGUID = $item.ExchangeGUID
-                    Identity     = $item.UserPrincipalName
-                    Trustee      = $mp.User
-                    AccessRights = $mp.AccessRights
+                foreach ($mpItem in $mp) {
+                    $tguid = $null
+                    if (-not ($mpItem.User -eq "NT AUTHORITY\SELF")) { $tguid = (Get-Mailbox -Identity $mpItem.User ).ExchangeGUID }
+                    $Results += [PSCustomObject]@{
+                        ExchangeGUID        = $item.ExchangeGUID
+                        Identity            = $item.UserPrincipalName
+                        Trustee             = $mpItem.User
+                        TrusteeExchangeGUID = $tguid
+                        AccessRights        = $mpItem.AccessRights
+                    }
                 }
+
             }
             if ( $Trustee -and ($TrusteeDisplayName -in $item.GrantSendOnBehalfTo)) {
                 $Results += [PSCustomObject]@{
+                    ExchangeGUID = $item.ExchangeGUID
                     Identity     = $item.UserPrincipalName
                     Trustee      = $item.GrantSendOnBehalfTo
                     AccessRights = "SendOnBehalf"
@@ -182,6 +195,7 @@ process {
             }
             elseif (!($Trustee) -and $item.GrantSendOnBehalfTo) {
                 $Results += [PSCustomObject]@{
+                    ExchangeGUID = $item.ExchangeGUID
                     Identity     = $item.UserPrincipalName
                     Trustee      = $item.GrantSendOnBehalfTo
                     AccessRights = "SendOnBehalf"
@@ -198,33 +212,33 @@ process {
 
 end {
     # Disconnect-ExchangeOnline -Confirm:$false
-    # #Export the Data to CSV file
-    # if ($OutputPath) {
-    #     if ( Test-Path $OutputPath ) {
-    #         $OutputPath = "$OutputPath\ExchangeMailboxPermissions.csv"
-    #         try {
-    #             Write-Host -f Green "Exporting results to '$OutputPath'"
-    #             if ($Append.IsPresent) {
-    #                 $Results | Export-Csv -Path $OutputPath -NoTypeInformation -Append
-    #             }
-    #             else {
-    #                 $Results | Export-Csv -Path $OutputPath -NoTypeInformation
-    #             }
-    #         }
-    #         catch {
-    #             Write-Warning "Failed to export results to '$OutputPath'"
-    #             Write-Verbose $Error[0]
-    #             Write-Warning "Outputting to console..."
-    #             Write-Output $Results
-    #         }
-    #     }
-    #     else {
-    #         Write-Warning "'$OutputPath' Does not exist, outputting to console"
-    #         Write-Output $Results
-    #     }
-    # }
-    # else {
-    #     Write-Output $Results
-    # }
+    #Export the Data to CSV file
+    if ($OutputPath) {
+        if ( Test-Path $OutputPath ) {
+            $OutputPath = "$OutputPath\ExchangeMailboxPermissions.csv"
+            try {
+                Write-Host -f Green "Exporting results to '$OutputPath'"
+                if ($Append.IsPresent) {
+                    $Results | Export-Csv -Path $OutputPath -NoTypeInformation -Append
+                }
+                else {
+                    $Results | Export-Csv -Path $OutputPath -NoTypeInformation
+                }
+            }
+            catch {
+                Write-Warning "Failed to export results to '$OutputPath'"
+                Write-Verbose $Error[0]
+                Write-Warning "Outputting to console..."
+                Write-Output $Results
+            }
+        }
+        else {
+            Write-Warning "'$OutputPath' Does not exist, outputting to console"
+            Write-Output $Results
+        }
+    }
+    else {
+        Write-Output $Results
+    }
 
 }
