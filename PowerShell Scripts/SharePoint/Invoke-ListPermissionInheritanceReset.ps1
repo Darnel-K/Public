@@ -3,7 +3,7 @@
  * Filename: \PowerShell Scripts\SharePoint\Invoke-ListPermissionInheritanceReset.ps1
  * Repository: Public
  * Created Date: Wednesday, January 25th 2023, 11:54:43 AM
- * Last Modified: Wednesday, March 22nd 2023, 10:42:27 AM
+ * Last Modified: Wednesday, March 22nd 2023, 11:07:20 AM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -77,8 +77,9 @@ param (
     # Disables members from being able to share items in the List / Document library if specified
     $DisableSharingForNonOwners = $false
 )
-$ProgressPreference = "Continue"
+
 begin {
+    $ProgressPreference = "Continue"
     # Import PnP Module
     try {
         Import-Module PnP.PowerShell
