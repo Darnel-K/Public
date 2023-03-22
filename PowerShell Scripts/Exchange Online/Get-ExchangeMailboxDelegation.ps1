@@ -3,7 +3,7 @@
  * Filename: \PowerShell Scripts\Exchange Online\Get-ExchangeMailboxDelegation.ps1
  * Repository: Public
  * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Wednesday, March 22nd 2023, 2:02:42 PM
+ * Last Modified: Wednesday, March 22nd 2023, 2:03:04 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -135,10 +135,6 @@ process {
         Write-Host "Checking Mailbox Permissions"
         $i = 0
         foreach ($item in $Mailboxes) {
-            # Generate progress bar
-            $i++
-            $PercentComplete = ($i / $Mailboxes.count) * 100
-            Write-Progress -Id 0 -Activity "Checking Mailbox Permissions" -Status "$([math]::Round($PercentComplete))% Complete" -PercentComplete $PercentComplete -CurrentOperation "Checking Mailbox: $($item.UserPrincipalName)"
             # Generate progress bar
             $i++
             $PercentComplete = ($i / $Mailboxes.count) * 100
