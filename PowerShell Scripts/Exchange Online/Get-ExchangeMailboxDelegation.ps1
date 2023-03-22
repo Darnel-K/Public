@@ -3,7 +3,7 @@
  * Filename: \PowerShell Scripts\Exchange Online\Get-ExchangeMailboxDelegation.ps1
  * Repository: Public
  * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Wednesday, March 22nd 2023, 5:20:28 PM
+ * Last Modified: Wednesday, March 22nd 2023, 5:25:28 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -73,7 +73,11 @@ Param (
     [Parameter()]
     [switch]
     # Appends results to exported file if -OutputPath is specified
-    $Append = $false
+    $Append = $false,
+    [Parameter()]
+    [switch]
+    # Revokes all access for the specified Trustee
+    $RevokeTrusteeAccess = $false
 )
 
 begin {
