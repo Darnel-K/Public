@@ -3,7 +3,7 @@
  * Filename: \PowerShell Scripts\Exchange Online\Get-ExchangeMailboxDelegation.ps1
  * Repository: Public
  * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Wednesday, March 22nd 2023, 3:56:14 PM
+ * Last Modified: Wednesday, March 22nd 2023, 5:20:28 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -82,6 +82,7 @@ begin {
     $Results = @()
     $DistGroups = @()
     $isIdGroup = $false
+    $isTrusteeGroup = $false
 
     # Get mailboxes from Exchange
     try {
@@ -96,9 +97,6 @@ begin {
                     Exit 1
                 }
             }
-            else {
-                # $DistGroups = Get-DistributionGroup | Where-Object { (Get-DistributionGroupMember $_.Name | ForEach-Object { $_.ExchangeObjectId }) -contains $Mailboxes[0].ExchangeObjectId }
-            }
         }
         elseif ($Trustee -and -not $Identity) {
             $Mailboxes = Get-Mailbox -ResultSize Unlimited
@@ -109,16 +107,10 @@ begin {
             Exit 1
         }
         if ($Trustee) {
-            $t = Get-Mailbox -Identity $Trustee
-            $TrusteeDisplayName = $t.DisplayName
-            # if ($Trustee -and $Identity) {
-            #     if ($isIdGroup) {
-            #         $DistGroups += Get-DistributionGroup -Identity $Identity | Where-Object { (Get-DistributionGroupMember $_.Name | ForEach-Object { $_.ExchangeObjectId }) -contains "$($t.ExchangeObjectId)" }
-            #     }
-            # }
-            # else {
-            #     $DistGroups = Get-DistributionGroup | Where-Object { (Get-DistributionGroupMember $_.Name | ForEach-Object { $_.ExchangeObjectId }) -contains "$($t.ExchangeObjectId)" }
-            # }
+            if (-not ($TrusteeObj = Get-Mailbox -Identity $Trustee)) {
+                Write-Error "Trustee should not be a Distribution / Mail-Enabled Security group"
+                Exit 1
+            }
         }
         Write-Host "Found $($Mailboxes.Count) mailboxes" -ForegroundColor Green
         Write-Host "Found $($DistGroups.Count) Distribution / Mail-Enabled Security groups" -ForegroundColor Green
@@ -141,12 +133,12 @@ process {
             Write-Progress -Id 0 -Activity "Checking Mailbox Permissions" -Status "$([math]::Round($PercentComplete))% Complete" -PercentComplete $PercentComplete -CurrentOperation "Checking Mailbox: $($item.UserPrincipalName)"
             try {
                 if ($Identity -and -not $Trustee) {
-                    $rp = Get-RecipientPermission -Identity $item.ExchangeGUID
-                    $mp = Get-MailboxPermission -Identity $item.ExchangeGUID
+                    $rp = Get-RecipientPermission -Identity $item.GUID
+                    $mp = Get-MailboxPermission -Identity $item.GUID
                 }
                 elseif (($Trustee -and -not $Identity) -or ($Identity -and $Trustee)) {
-                    $rp = Get-RecipientPermission -Identity $item.ExchangeGUID -Trustee $Trustee
-                    $mp = Get-MailboxPermission -Identity $item.ExchangeGUID -User $Trustee
+                    $rp = Get-RecipientPermission -Identity $item.GUID -Trustee $TrusteeObj
+                    $mp = Get-MailboxPermission -Identity $item.GUID -User $TrusteeObj
                 }
                 else {
                     Write-Error "-Identity or -Trustee parameter not specified, one or both of these parameters must be specified."
@@ -160,13 +152,13 @@ process {
             if ($null -ne $rp) {
                 foreach ($rpItem in $rp) {
                     $tguid = $null
-                    if (-not ($rpItem.Trustee -eq "NT AUTHORITY\SELF")) { $tguid = (Get-Mailbox -Identity $rpItem.Trustee ).ExchangeGUID }
+                    if (-not ($rpItem.Trustee -eq "NT AUTHORITY\SELF")) { $tguid = (Get-Mailbox -Identity $rpItem.Trustee ).GUID }
                     $Results += [PSCustomObject]@{
-                        ExchangeGUID        = $item.ExchangeGUID
-                        Identity            = $item.UserPrincipalName
-                        Trustee             = $rpItem.Trustee
-                        TrusteeExchangeGUID = $tguid
-                        AccessRights        = $rpItem.AccessRights
+                        GUID         = $item.GUID
+                        Identity     = $item.UserPrincipalName
+                        Trustee      = $rpItem.Trustee
+                        TrusteeGUID  = $tguid
+                        AccessRights = $rpItem.AccessRights
                     }
                 }
 
@@ -174,38 +166,86 @@ process {
             if ($null -ne $mp) {
                 foreach ($mpItem in $mp) {
                     $tguid = $null
-                    if (-not ($mpItem.User -eq "NT AUTHORITY\SELF")) { $tguid = (Get-Mailbox -Identity $mpItem.User ).ExchangeGUID }
+                    if (-not ($mpItem.User -eq "NT AUTHORITY\SELF")) { $tguid = (Get-Mailbox -Identity $mpItem.User ).GUID }
                     $Results += [PSCustomObject]@{
-                        ExchangeGUID        = $item.ExchangeGUID
-                        Identity            = $item.UserPrincipalName
-                        Trustee             = $mpItem.User
-                        TrusteeExchangeGUID = $tguid
-                        AccessRights        = $mpItem.AccessRights
+                        GUID         = $item.GUID
+                        Identity     = $item.UserPrincipalName
+                        Trustee      = $mpItem.User
+                        TrusteeGUID  = $tguid
+                        AccessRights = $mpItem.AccessRights
                     }
                 }
 
             }
-            if ( $Trustee -and ($TrusteeDisplayName -in $item.GrantSendOnBehalfTo)) {
+            if ( $Trustee -and (($TrusteeObj.DisplayName) -in $item.GrantSendOnBehalfTo)) {
                 $Results += [PSCustomObject]@{
-                    ExchangeGUID = $item.ExchangeGUID
+                    GUID         = $item.GUID
                     Identity     = $item.UserPrincipalName
-                    Trustee      = $item.GrantSendOnBehalfTo
+                    Trustee      = $TrusteeObj.UserPrincipalName
+                    TrusteeGUID  = $TrusteeObj.GUID
                     AccessRights = "SendOnBehalf"
                 }
             }
             elseif (!($Trustee) -and $item.GrantSendOnBehalfTo) {
-                $Results += [PSCustomObject]@{
-                    ExchangeGUID = $item.ExchangeGUID
-                    Identity     = $item.UserPrincipalName
-                    Trustee      = $item.GrantSendOnBehalfTo
-                    AccessRights = "SendOnBehalf"
+                foreach ($sobItem in ($item.GrantSendOnBehalfTo).Split(",")) {
+                    if ( $TrusteeObj = Get-Mailbox -Identity $sobItem) {
+                        $Results += [PSCustomObject]@{
+                            GUID         = $item.GUID
+                            Identity     = $item.UserPrincipalName
+                            Trustee      = $TrusteeObj.UserPrincipalName
+                            TrusteeGUID  = $TrusteeObj.GUID
+                            AccessRights = "SendOnBehalf"
+                        }
+                    }
+                    else {
+                        $Results += [PSCustomObject]@{
+                            GUID         = $item.GUID
+                            Identity     = $item.UserPrincipalName
+                            Trustee      = $sobItem
+                            TrusteeGUID  = $null
+                            AccessRights = "SendOnBehalf"
+                        }
+                    }
                 }
             }
         }
-        Write-Host "Completed Permissions Check" -ForegroundColor Green
+        Write-Host "Completed Mailbox Permissions Check" -ForegroundColor Green
     }
     if ($DistGroups.Count -gt 0) {
-        Write-Host $DistGroups.Count
+        Write-Host "Checking Distribution / Mail-Enabled Security Group Membership"
+        $i = 0
+        foreach ($item in $DistGroups) {
+            # Generate progress bar
+            $i++
+            $PercentComplete = ($i / $DistGroups.count) * 100
+            Write-Progress -Id 0 -Activity "Checking Distribution / Mail-Enabled Security Group Membership" -Status "$([math]::Round($PercentComplete))% Complete" -PercentComplete $PercentComplete -CurrentOperation "Checking Distribution / Mail-Enabled Security Group: $($item.PrimarySmtpAddress)"
+            $Members = Get-DistributionGroupMember -Identity $item
+            if ($Trustee) {
+                foreach ($m in $Members) {
+                    if ($m.PrimarySmtpAddress -contains $TrusteeObj.UserPrincipalName) {
+                        $Results += [PSCustomObject]@{
+                            GUID         = $item.GUID
+                            Identity     = $item.PrimarySmtpAddress
+                            Trustee      = $m.PrimarySmtpAddress
+                            TrusteeGUID  = $m.GUID
+                            AccessRights = "Member"
+                        }
+                    }
+                }
+            }
+            else {
+                foreach ($m in $Members) {
+                    $Results += [PSCustomObject]@{
+                        GUID         = $item.GUID
+                        Identity     = $item.PrimarySmtpAddress
+                        Trustee      = $m.PrimarySmtpAddress
+                        TrusteeGUID  = $m.GUID
+                        AccessRights = "Member"
+                    }
+                }
+            }
+        }
+        Write-Host "Completed Distribution / Mail-Enabled Security Group Membership Check" -ForegroundColor Green
     }
 
 }
