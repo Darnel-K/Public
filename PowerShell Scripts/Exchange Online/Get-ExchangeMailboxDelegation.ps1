@@ -3,7 +3,7 @@
  * Filename: \PowerShell Scripts\Exchange Online\Get-ExchangeMailboxDelegation.ps1
  * Repository: Public
  * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Monday, March 27th 2023, 2:34:37 PM
+ * Last Modified: Monday, March 27th 2023, 2:36:38 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -90,7 +90,7 @@ begin {
 
     # Get mailboxes from Exchange
     try {
-        # Connect-ExchangeOnline
+        Connect-ExchangeOnline
         Write-Host "Please wait, retrieving mailboxes from server..."
         if (($Identity -and -not $Trustee) -or ($Identity -and $Trustee)) {
             if (-not ($Mailboxes += Get-Mailbox -ResultSize Unlimited -Identity $Identity)) {
@@ -255,7 +255,7 @@ process {
 }
 
 end {
-    Disconnect-ExchangeOnline -Confirm:$false
+    # Disconnect-ExchangeOnline -Confirm:$false
     #Export the Data to CSV file
     if ($OutputPath) {
         if ( Test-Path $OutputPath ) {
