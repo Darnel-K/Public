@@ -3,7 +3,7 @@
  * Filename: \PowerShell Scripts\Exchange Online\Get-ExchangeMailboxDelegation.ps1
  * Repository: Public
  * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Wednesday, March 22nd 2023, 5:25:28 PM
+ * Last Modified: Monday, March 27th 2023, 2:34:37 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -255,7 +255,7 @@ process {
 }
 
 end {
-    # Disconnect-ExchangeOnline -Confirm:$false
+    Disconnect-ExchangeOnline -Confirm:$false
     #Export the Data to CSV file
     if ($OutputPath) {
         if ( Test-Path $OutputPath ) {
