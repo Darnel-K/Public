@@ -3,7 +3,7 @@
  * Filename: \PowerShell Scripts\Exchange Online\Get-ExchangeMailboxDelegation.ps1
  * Repository: Public
  * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Wednesday, March 29th 2023, 4:26:46 PM
+ * Last Modified: Wednesday, March 29th 2023, 4:39:20 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -56,6 +56,18 @@
     & .\Get-ExchangeMailboxDelegation.ps1 -Trustee "testuser1@example.com"
 
     Checks what permissions Trustee has been granted against all mailboxes in the tenant.
+.EXAMPLE
+    & .\Get-ExchangeMailboxDelegation.ps1 -Identity "testuser1@example.com" -RevokeTrusteeAccess
+
+    Revokes all permissions for any mailbox with access to the mailbox specified using the identity parameter
+.EXAMPLE
+    & .\Get-ExchangeMailboxDelegation.ps1 -Identity "testuser1@example.com" -Trustee "testuser2@example.com" -RevokeTrusteeAccess
+
+    Revokes all permissions for the mailbox identified by the Trustee parameter found on the mailbox specified using the identity parameter
+.EXAMPLE
+    & .\Get-ExchangeMailboxDelegation.ps1 -Trustee "testuser1@example.com" -RevokeTrusteeAccess
+
+    Revokes all permissions for the mailbox identified by the Trustee parameter globally across all mailboxes
 #>
 
 [CmdletBinding()]
@@ -76,7 +88,7 @@ Param (
     $Append = $false,
     [Parameter()]
     [switch]
-    # Revokes all access for the specified Trustee
+    # Revokes all access for the Trustee
     $RevokeTrusteeAccess = $false
 )
 
