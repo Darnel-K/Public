@@ -3,7 +3,7 @@
  * Filename: \PowerShell Scripts\Exchange Online\Get-ExchangeMailboxDelegation.ps1
  * Repository: Public
  * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Wednesday, March 29th 2023, 1:31:13 PM
+ * Last Modified: Wednesday, March 29th 2023, 2:29:48 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -260,28 +260,35 @@ process {
             Write-Progress -Id 0 -Activity "Removing Mailbox Permissions" -Status "$([math]::Round($PercentComplete))% Complete" -PercentComplete $PercentComplete -CurrentOperation "Removing Trustee Permissions: $($item.Trustee)"
             if (-not ($null -eq $item.TrusteeGUID)) {
                 switch -Wildcard ($item.AccessRights) {
-                    "*SendOnBehalf*" {
-                        Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue "SendOnBehalf"
-                        break
-                    }
-                    "*Member*" {
-                        if (Remove-DistributionGroupMember -Identity $item.GUID -Member $item.TrusteeGUID -BypassSecurityGroupManagerCheck -WhatIf -ErrorAction SilentlyContinue) {
+                    "*SendAs*" {
+                        if (Remove-MailboxPermission -Identity $item.GUID -User $item.TrusteeGUID -AccessRights FullAccess, SendAs, ExternalAccount, DeleteItem, ReadPermission, ChangePermission, ChangeOwner -InheritanceType All -Confirm:$false -WhatIf) {
                             Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue $true
                         }
                         else {
-                            Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue "FAILED1"
-                            Write-Warning "1Unable to remove $($item.Trustee) from $($item.Identity)"
+                            Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue "FAILED"
+                            Write-Warning "Unable to remove $($item.Trustee) from $($item.Identity)"
                             Write-Warning "This may need to be done manually from the on-premise Active Directory server or Exchange Online admin center"
                         }
                         break
                     }
-                    { ($_ -contains "FullAccess") -or ($_ -contains "SendAs") } {
-                        if (Remove-MailboxPermission -Identity $item.GUID -User $item.TrusteeGUID -AccessRights FullAccess, SendAs, ExternalAccount, DeleteItem, ReadPermission, ChangePermission, ChangeOwner -InheritanceType All -WhatIf) {
+                    "*Member*" {
+                        if (Remove-DistributionGroupMember -Identity $item.GUID -Member $item.TrusteeGUID -BypassSecurityGroupManagerCheck -Confirm:$false -WhatIf -ErrorAction SilentlyContinue) {
                             Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue $true
                         }
                         else {
-                            Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue "FAILED2"
-                            Write-Warning "2Unable to remove $($item.Trustee) from $($item.Identity)"
+                            Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue "FAILED"
+                            Write-Warning "Unable to remove $($item.Trustee) from $($item.Identity)"
+                            Write-Warning "This may need to be done manually from the on-premise Active Directory server or Exchange Online admin center"
+                        }
+                        break
+                    }
+                    "*FullAccess*" {
+                        if (Remove-MailboxPermission -Identity $item.GUID -User $item.TrusteeGUID -AccessRights FullAccess, SendAs, ExternalAccount, DeleteItem, ReadPermission, ChangePermission, ChangeOwner -InheritanceType All -Confirm:$false -WhatIf) {
+                            Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue $true
+                        }
+                        else {
+                            Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue "FAILED"
+                            Write-Warning "Unable to remove $($item.Trustee) from $($item.Identity)"
                             Write-Warning "This may need to be done manually from the on-premise Active Directory server or Exchange Online admin center"
                         }
                         break
