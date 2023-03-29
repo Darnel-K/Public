@@ -3,7 +3,7 @@
  * Filename: \PowerShell Scripts\Template.ps1
  * Repository: Public
  * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Wednesday, March 15th 2023, 4:42:53 PM
+ * Last Modified: Wednesday, March 29th 2023, 11:14:05 AM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -44,6 +44,8 @@ Param (
     $Param1
 )
 begin {
+    $ProgressPreference = "Continue"
+    $host.ui.RawUI.WindowTitle = $MyInvocation.MyCommand.Name
     # Update LogName and LogSource
     $LogName = "ABYSS.ORG.UK"; $LogSource = "";
     if (-not ([System.Diagnostics.EventLog]::Exists($LogName)) -or -not ([System.Diagnostics.EventLog]::SourceExists($LogSource))) {
