@@ -3,7 +3,7 @@
  * Filename: \PowerShell Scripts\Exchange Online\Get-ExchangeMailboxDelegation.ps1
  * Repository: Public
  * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Wednesday, March 29th 2023, 4:49:44 PM
+ * Last Modified: Wednesday, March 29th 2023, 5:05:50 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -106,7 +106,6 @@ begin {
         if (($Identity -and -not $Trustee) -or ($Identity -and $Trustee)) {
             if (-not ($Mailboxes += Get-Mailbox -ResultSize Unlimited -Identity $Identity -ErrorAction SilentlyContinue)) {
                 Write-Host "Unable to find $Identity, searching Distribution & Mail-Enabled Security groups..." -ForegroundColor Yellow
-                $isIdGroup = $true
                 if (-not ($DistGroups += Get-DistributionGroup -Identity $Identity)) {
                     Write-Warning "Unable to find $Identity in Exchange..."
                     Exit 1
