@@ -3,7 +3,7 @@
  * Filename: \PowerShell Scripts\Exchange Online\Get-ExchangeMailboxDelegation.ps1
  * Repository: Public
  * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Wednesday, March 29th 2023, 4:10:37 PM
+ * Last Modified: Wednesday, March 29th 2023, 4:25:42 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -251,19 +251,18 @@ process {
         Write-Host "Completed Distribution / Mail-Enabled Security Group Membership Check" -ForegroundColor Green
     }
     if ($RevokeTrusteeAccess -eq $true) {
-        Write-Host "Removing Mailbox Permissions"
+        Write-Host "Removing Mailbox Permissions & Group Membership"
         $i = 0
         foreach ($item in $Results) {
             # Generate progress bar
-            Write-Host $item.GrantSendOnBehalfTo
             $i++
             $PercentComplete = ($i / $Results.count) * 100
-            Write-Progress -Id 0 -Activity "Removing Mailbox Permissions" -Status "$([math]::Round($PercentComplete))% Complete" -PercentComplete $PercentComplete -CurrentOperation "Removing Trustee Permissions: $($item.Trustee)"
+            Write-Progress -Id 0 -Activity "Removing Mailbox Permissions & Group Membership" -Status "$([math]::Round($PercentComplete))% Complete" -PercentComplete $PercentComplete -CurrentOperation "Removing Trustee Permission '$($item.AccessRights)' for '$($item.Trustee)' from '$($item.Identity)'"
             if (-not ($null -eq $item.TrusteeGUID)) {
                 switch -Wildcard ($item.AccessRights) {
                     "*SendOnBehalf*" {
                         try {
-                            Set-Mailbox -Identity $item.GUID -GrantSendOnBehalfTo @{remove = "$($item.TrusteeGUID)" } -ErrorAction Stop
+                            Set-Mailbox -Identity $item.GUID -GrantSendOnBehalfTo @{remove = "$($item.TrusteeGUID)" } -Confirm:$false -ErrorAction Stop
                             Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue $true
                         }
                         catch {
