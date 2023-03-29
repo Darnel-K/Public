@@ -3,7 +3,7 @@
  * Filename: \PowerShell Scripts\Exchange Online\Get-ExchangeMailboxDelegation.ps1
  * Repository: Public
  * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Wednesday, March 29th 2023, 2:29:48 PM
+ * Last Modified: Wednesday, March 29th 2023, 3:08:51 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -261,12 +261,12 @@ process {
             if (-not ($null -eq $item.TrusteeGUID)) {
                 switch -Wildcard ($item.AccessRights) {
                     "*SendAs*" {
-                        if (Remove-MailboxPermission -Identity $item.GUID -User $item.TrusteeGUID -AccessRights FullAccess, SendAs, ExternalAccount, DeleteItem, ReadPermission, ChangePermission, ChangeOwner -InheritanceType All -Confirm:$false -WhatIf) {
+                        if (Remove-RecipientPermission  -Identity $item.GUID -Trustee $item.TrusteeGUID -AccessRights SendAs -Confirm:$false -WhatIf) {
                             Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue $true
                         }
                         else {
                             Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue "FAILED"
-                            Write-Warning "Unable to remove $($item.Trustee) from $($item.Identity)"
+                            Write-Warning "Unable to remove permission '$($item.AccessRights)' for '$($item.Trustee)' from '$($item.Identity)'"
                             Write-Warning "This may need to be done manually from the on-premise Active Directory server or Exchange Online admin center"
                         }
                         break
@@ -277,18 +277,18 @@ process {
                         }
                         else {
                             Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue "FAILED"
-                            Write-Warning "Unable to remove $($item.Trustee) from $($item.Identity)"
+                            Write-Warning "Unable to remove permission '$($item.AccessRights)' for '$($item.Trustee)' from '$($item.Identity)'"
                             Write-Warning "This may need to be done manually from the on-premise Active Directory server or Exchange Online admin center"
                         }
                         break
                     }
                     "*FullAccess*" {
-                        if (Remove-MailboxPermission -Identity $item.GUID -User $item.TrusteeGUID -AccessRights FullAccess, SendAs, ExternalAccount, DeleteItem, ReadPermission, ChangePermission, ChangeOwner -InheritanceType All -Confirm:$false -WhatIf) {
+                        if (Remove-MailboxPermission -Identity $item.GUID -User $item.TrusteeGUID -AccessRights FullAccess, ExternalAccount, DeleteItem, ReadPermission, ChangePermission, ChangeOwner -InheritanceType All -Confirm:$false -WhatIf) {
                             Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue $true
                         }
                         else {
                             Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue "FAILED"
-                            Write-Warning "Unable to remove $($item.Trustee) from $($item.Identity)"
+                            Write-Warning "Unable to remove permission '$($item.AccessRights)' for '$($item.Trustee)' from '$($item.Identity)'"
                             Write-Warning "This may need to be done manually from the on-premise Active Directory server or Exchange Online admin center"
                         }
                         break
