@@ -3,7 +3,7 @@
  * Filename: \PowerShell Scripts\Exchange Online\Get-ExchangeMailboxDelegation.ps1
  * Repository: Public
  * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Monday, March 27th 2023, 2:36:38 PM
+ * Last Modified: Wednesday, March 29th 2023, 1:31:13 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -82,18 +82,17 @@ Param (
 
 begin {
     $ProgressPreference = "Continue"
+    $host.ui.RawUI.WindowTitle = $MyInvocation.MyCommand.Name
     $Mailboxes = @()
     $Results = @()
     $DistGroups = @()
-    $isIdGroup = $false
-    $isTrusteeGroup = $false
 
     # Get mailboxes from Exchange
     try {
-        Connect-ExchangeOnline
+        # Connect-ExchangeOnline
         Write-Host "Please wait, retrieving mailboxes from server..."
         if (($Identity -and -not $Trustee) -or ($Identity -and $Trustee)) {
-            if (-not ($Mailboxes += Get-Mailbox -ResultSize Unlimited -Identity $Identity)) {
+            if (-not ($Mailboxes += Get-Mailbox -ResultSize Unlimited -Identity $Identity -ErrorAction SilentlyContinue)) {
                 Write-Host "Unable to find $Identity, searching Distribution & Mail-Enabled Security groups..." -ForegroundColor Yellow
                 $isIdGroup = $true
                 if (-not ($DistGroups += Get-DistributionGroup -Identity $Identity)) {
@@ -250,6 +249,49 @@ process {
             }
         }
         Write-Host "Completed Distribution / Mail-Enabled Security Group Membership Check" -ForegroundColor Green
+    }
+    if ($RevokeTrusteeAccess -eq $true) {
+        Write-Host "Removing Mailbox Permissions"
+        $i = 0
+        foreach ($item in $Results) {
+            # Generate progress bar
+            $i++
+            $PercentComplete = ($i / $Results.count) * 100
+            Write-Progress -Id 0 -Activity "Removing Mailbox Permissions" -Status "$([math]::Round($PercentComplete))% Complete" -PercentComplete $PercentComplete -CurrentOperation "Removing Trustee Permissions: $($item.Trustee)"
+            if (-not ($null -eq $item.TrusteeGUID)) {
+                switch -Wildcard ($item.AccessRights) {
+                    "*SendOnBehalf*" {
+                        Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue "SendOnBehalf"
+                        break
+                    }
+                    "*Member*" {
+                        if (Remove-DistributionGroupMember -Identity $item.GUID -Member $item.TrusteeGUID -BypassSecurityGroupManagerCheck -WhatIf -ErrorAction SilentlyContinue) {
+                            Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue $true
+                        }
+                        else {
+                            Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue "FAILED1"
+                            Write-Warning "1Unable to remove $($item.Trustee) from $($item.Identity)"
+                            Write-Warning "This may need to be done manually from the on-premise Active Directory server or Exchange Online admin center"
+                        }
+                        break
+                    }
+                    { ($_ -contains "FullAccess") -or ($_ -contains "SendAs") } {
+                        if (Remove-MailboxPermission -Identity $item.GUID -User $item.TrusteeGUID -AccessRights FullAccess, SendAs, ExternalAccount, DeleteItem, ReadPermission, ChangePermission, ChangeOwner -InheritanceType All -WhatIf) {
+                            Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue $true
+                        }
+                        else {
+                            Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue "FAILED2"
+                            Write-Warning "2Unable to remove $($item.Trustee) from $($item.Identity)"
+                            Write-Warning "This may need to be done manually from the on-premise Active Directory server or Exchange Online admin center"
+                        }
+                        break
+                    }
+                }
+            }
+            else {
+                Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue $false
+            }
+        }
     }
 
 }
