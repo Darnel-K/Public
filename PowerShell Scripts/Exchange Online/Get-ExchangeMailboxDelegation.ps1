@@ -3,7 +3,7 @@
  * Filename: \PowerShell Scripts\Exchange Online\Get-ExchangeMailboxDelegation.ps1
  * Repository: Public
  * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Wednesday, March 29th 2023, 5:05:50 PM
+ * Last Modified: Thursday, March 30th 2023, 12:34:31 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -233,7 +233,7 @@ process {
             $i++
             $PercentComplete = ($i / $DistGroups.count) * 100
             Write-Progress -Id 0 -Activity "Checking Distribution / Mail-Enabled Security Group Membership" -Status "$([math]::Round($PercentComplete))% Complete" -PercentComplete $PercentComplete -CurrentOperation "Checking Distribution / Mail-Enabled Security Group: $($item.PrimarySmtpAddress)"
-            $Members = Get-DistributionGroupMember -Identity $item
+            $Members = Get-DistributionGroupMember -Identity $item.GUID
             if ($Trustee) {
                 foreach ($m in $Members) {
                     if ($m.PrimarySmtpAddress -contains $TrusteeObj.UserPrincipalName) {
