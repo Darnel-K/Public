@@ -3,7 +3,7 @@
  * Filename: \PowerShell Scripts\Exchange Online\Get-ExchangeMailboxDelegation.ps1
  * Repository: Public
  * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Thursday, March 30th 2023, 12:44:16 PM
+ * Last Modified: Wednesday, April 5th 2023, 5:00:01 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -151,8 +151,8 @@ process {
                     $mp = Get-MailboxPermission -Identity $item.GUID
                 }
                 elseif (($Trustee -and -not $Identity) -or ($Identity -and $Trustee)) {
-                    $rp = Get-RecipientPermission -Identity $item.GUID -Trustee $TrusteeObj
-                    $mp = Get-MailboxPermission -Identity $item.GUID -User $TrusteeObj
+                    $rp = Get-RecipientPermission -Identity $item.GUID -Trustee $TrusteeObj.GUID
+                    $mp = Get-MailboxPermission -Identity $item.GUID -User $TrusteeObj.GUID
                 }
                 else {
                     Write-Error "-Identity or -Trustee parameter not specified, one or both of these parameters must be specified."
