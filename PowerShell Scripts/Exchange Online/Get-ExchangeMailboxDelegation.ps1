@@ -3,7 +3,7 @@
  * Filename: \PowerShell Scripts\Exchange Online\Get-ExchangeMailboxDelegation.ps1
  * Repository: Public
  * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Wednesday, April 5th 2023, 5:00:01 PM
+ * Last Modified: Wednesday, April 12th 2023, 9:01:42 AM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -166,7 +166,7 @@ process {
             if ($null -ne $rp) {
                 foreach ($rpItem in $rp) {
                     $tguid = $null
-                    if (-not ($rpItem.Trustee -eq "NT AUTHORITY\SELF")) { $tguid = (Get-Mailbox -Identity $rpItem.Trustee ).GUID }
+                    if (-not ($rpItem.Trustee -eq "NT AUTHORITY\SELF")) { $tguid = (Get-Mailbox -Identity $rpItem.Trustee -ErrorAction SilentlyContinue ).GUID }
                     $Results += [PSCustomObject]@{
                         GUID         = $item.GUID
                         Identity     = $item.UserPrincipalName
@@ -180,7 +180,7 @@ process {
             if ($null -ne $mp) {
                 foreach ($mpItem in $mp) {
                     $tguid = $null
-                    if (-not ($mpItem.User -eq "NT AUTHORITY\SELF")) { $tguid = (Get-Mailbox -Identity $mpItem.User ).GUID }
+                    if (-not ($mpItem.User -eq "NT AUTHORITY\SELF")) { $tguid = (Get-Mailbox -Identity $mpItem.User -ErrorAction SilentlyContinue ).GUID }
                     $Results += [PSCustomObject]@{
                         GUID         = $item.GUID
                         Identity     = $item.UserPrincipalName
