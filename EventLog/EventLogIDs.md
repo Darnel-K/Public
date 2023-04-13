@@ -8,3 +8,5 @@
 ## Warnings
 
 - 1000: Unable to initialise event log, falling back to Application log and source, most likely due to being run without elevated privileges
+- 1001: Unable to install language pack
+- 1002: Unable to set SystemPreferredUILanguage
