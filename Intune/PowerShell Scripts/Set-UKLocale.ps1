@@ -3,7 +3,7 @@
  * Filename: \Intune\PowerShell Scripts\Set-UKLocale.ps1
  * Repository: Public
  * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Thursday, April 13th 2023, 2:58:19 PM
+ * Last Modified: Thursday, April 13th 2023, 5:15:31 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -95,3 +95,45 @@ if (-not ((Get-SystemPreferredUILanguage) -eq $DesiredLanguage)) {
 else {
     Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "SystemPreferredUILanguage already set to $DesiredLanguage" -EventId 0
 }
+
+# $CultureName = "ABYSS-ORG-UK_$DesiredLanguage"
+# $BaseCulture = [cultureinfo]::GetCultureInfo($DesiredLanguage)
+# $BaseRegion = New-Object System.Globalization.RegionInfo 'GB'
+# $Changes = @{
+#     GregorianDateTimeFormat = [Hashtable]@{
+#         FullDateTimePattern = "dddd, dd MMMM yyyy - hh:mm:ss tt"
+#         LongDatePattern     = "dddd, dd MMMM yyyy"
+#         LongTimePattern     = "hh:mm:ss tt"
+#         MonthDayPattern     = "dd MMMM"
+#         ShortDatePattern    = "yyyy-MM-dd"
+#         ShortTimePattern    = "hh:mm tt"
+#     }
+# }
+
+# try {
+#     # Set up CultureAndRegionInfoBuilder
+#     Add-Type -AssemblyName sysglobl
+#     $CultureBuilder = New-Object System.Globalization.CultureAndRegionInfoBuilder @($CultureName, [System.Globalization.CultureAndRegionModifiers]::None)
+#     $CultureBuilder.LoadDataFromCultureInfo($BaseCulture)
+#     $CultureBuilder.LoadDataFromRegionInfo($BaseRegion)
+
+
+#     # Make appropriate changes
+#     foreach ($Property in $Changes.Keys) {
+#         if (($CultureBuilder.$Property -is [string]) -or ($CultureBuilder.$Property -is [int])) {
+#             $CultureBuilder.$Property = $Changes[$Property]
+#         }
+#         else {
+#             foreach ($item in $Changes.$Property.Keys) {
+#                 $CultureBuilder.$Property.$item = $Changes.$Property.$item
+#             }
+#         }
+#     }
+
+#     # Register your new culture
+#     $CultureBuilder.Register()
+
+# }
+# catch {
+#     throw
+# }
