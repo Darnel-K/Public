@@ -3,7 +3,7 @@
  * Filename: \Intune\PowerShell Scripts\Set-UKLocale.ps1
  * Repository: Public
  * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Thursday, April 13th 2023, 5:15:57 PM
+ * Last Modified: Thursday, April 13th 2023, 5:25:47 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -30,6 +30,7 @@ $ProgressPreference = "Continue"
 $host.ui.RawUI.WindowTitle = $MyInvocation.MyCommand.Name
 $LogName = "ABYSS.ORG.UK"; $LogSource = ".Intune.PSScript.SetUKLocale";
 $DesiredLanguage = "en-GB"
+$DesiredRegion = "GB"
 
 
 if (-not ([System.Diagnostics.EventLog]::Exists($LogName)) -or -not ([System.Diagnostics.EventLog]::SourceExists($LogSource))) {
@@ -97,7 +98,7 @@ else {
 
 # $CultureName = "ABYSS-ORG-UK_$DesiredLanguage"
 # $BaseCulture = [cultureinfo]::GetCultureInfo($DesiredLanguage)
-# $BaseRegion = New-Object System.Globalization.RegionInfo 'GB'
+# $BaseRegion = New-Object System.Globalization.RegionInfo "$DesiredRegion"
 # $Changes = @{
 #     GregorianDateTimeFormat = [Hashtable]@{
 #         FullDateTimePattern = "dddd, dd MMMM yyyy - hh:mm:ss tt"
