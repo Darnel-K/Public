@@ -15,3 +15,4 @@
 - 1005: Unable to set WinHomeLocation
 - 1006: Unable to set windows culture
 - 1007: Unable to set WinSystemLocale
+- 1008: Unable to uninstall language pack
