@@ -3,7 +3,7 @@
  * Filename: \Intune\PowerShell Scripts\Set-UKLocale.ps1
  * Repository: Public
  * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Friday, April 14th 2023, 2:00:25 PM
+ * Last Modified: Friday, April 14th 2023, 3:54:14 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -149,10 +149,83 @@ if (-not ((Get-SystemPreferredUILanguage) -eq $DesiredLanguage)) {
     }
     catch {
         Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message "Unable to set SystemPreferredUILanguage to $DesiredLanguage" -EventId 1002
-        Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message $Error[0] -EventId 1001
+        Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message $Error[0] -EventId 1002
         Exit 1
     }
 }
 else {
     Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "SystemPreferredUILanguage already set to $DesiredLanguage" -EventId 0
 }
+
+# Check if WinHomeLocation is set to United Kingdom
+Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Checking if WinHomeLocation is set to United Kingdom" -EventId 0
+if (-not ((Get-WinHomeLocation).GeoId -eq 242)) {
+    Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "WinHomeLocation not set to United Kingdom" -EventId 0
+    try {
+        Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Attempting to set WinHomeLocation to United Kingdom" -EventId 0
+        Set-WinHomeLocation -GeoId 242
+        if ((Get-WinHomeLocation).GeoId -eq 242) {
+            Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "WinHomeLocation set to United Kingdom successfully" -EventId 0
+        }
+        else {
+            Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message "Unable to set WinHomeLocation to United Kingdom" -EventId 1005
+            Exit 1
+        }
+    }
+    catch {
+        Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message "Unable to set WinHomeLocation to United Kingdom" -EventId 1005
+        Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message $Error[0] -EventId 1005
+        Exit 1
+    }
+}
+else {
+    Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "WinHomeLocation already set to United Kingdom" -EventId 0
+}
+
+# Check if WinSystemLocale is set to $CultureName
+Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Checking if WinSystemLocale is set to $CultureName" -EventId 0
+if (-not ((Get-WinSystemLocale).Name -eq $CultureName)) {
+    Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "WinSystemLocale not set to $CultureName" -EventId 0
+    try {
+        Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Attempting to set WinSystemLocale to $CultureName" -EventId 0
+        Set-WinSystemLocale -SystemLocale $CultureName
+        if ((Get-WinSystemLocale).Name -eq $CultureName) {
+            Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "WinSystemLocale set to $CultureName successfully" -EventId 0
+        }
+        else {
+            Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message "Unable to set WinSystemLocale to $CultureName" -EventId 1007
+            Exit 1
+        }
+    }
+    catch {
+        Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message "Unable to set WinSystemLocale to $CultureName" -EventId 1007
+        Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message $Error[0] -EventId 1007
+        Exit 1
+    }
+}
+else {
+    Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "WinSystemLocale already set to $CultureName" -EventId 0
+}
+
+# Set user culture
+try {
+    Set-Culture $CultureName
+    Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Culture '$CultureName' set successfully" -EventId 0
+}
+catch {
+    Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message "Unable to set culture '$CultureName'" -EventId 1006
+    Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message $Error[0] -EventId 1006
+    Exit 1
+}
+
+# Copy locale settings to system
+try {
+    Set-Culture $CultureName
+    Copy-UserInternationalSettingsToSystem -WelcomeScreen $True -NewUser $True
+    Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Copied locale settings to system" -EventId 0
+}
+catch {
+    Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message "Unable copy locale settings to system" -EventId 1004
+    Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message $Error[0] -EventId 1004
+}
+Exit 0
