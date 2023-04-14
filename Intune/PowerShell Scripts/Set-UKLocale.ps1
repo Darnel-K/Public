@@ -3,7 +3,7 @@
  * Filename: \Intune\PowerShell Scripts\Set-UKLocale.ps1
  * Repository: Public
  * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Friday, April 14th 2023, 5:15:00 PM
+ * Last Modified: Saturday, April 15th 2023, 12:06:47 AM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -13,9 +13,9 @@
 
 <#
 .SYNOPSIS
-    A brief description of the function or script. This keyword can be used only once in each topic.
+    This script sets the system language settings to English (United Kingdom).
 .DESCRIPTION
-    A detailed description of the function or script. This keyword can be used only once in each topic.
+    This script installs the English (United Kingdom) language pack from the windows store, sets the system to English (United Kingdom), sets the date and time formats and uninstalls all other language packs.
 .NOTES
     This script can be run standalone or deployed using Intune
 .EXAMPLE
