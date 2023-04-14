@@ -3,7 +3,7 @@
  * Filename: \Intune\PowerShell Scripts\Set-UKLocale.ps1
  * Repository: Public
  * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Thursday, April 13th 2023, 5:25:47 PM
+ * Last Modified: Friday, April 14th 2023, 2:00:25 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -44,6 +44,67 @@ if (-not ([System.Diagnostics.EventLog]::Exists($LogName)) -or -not ([System.Dia
         Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message $Message -EventId 1000
         Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message $Error[0] -EventId 1000
     }
+}
+
+# Create new Culture
+$CultureName = "ABYSS-ORG-UK_$DesiredLanguage"
+$CultureExists = $false
+Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Checking if culture: '$CultureName' exists" -EventId 0
+try {
+    if (-not (([cultureinfo]::GetCultureInfo($CultureName)).DisplayName -like "*Unknown*")) {
+        $CultureExists = $true
+    }
+}
+catch {
+    $CultureExists = $false
+}
+if (-not $CultureExists) {
+    Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Culture: '$CultureName' does not exist" -EventId 0
+    Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Attempting to create new windows culture: '$CultureName'" -EventId 0
+    $BaseCulture = [cultureinfo]::GetCultureInfo($DesiredLanguage)
+    $BaseRegion = New-Object System.Globalization.RegionInfo "$DesiredRegion"
+    $Changes = @{
+        GregorianDateTimeFormat = [Hashtable]@{
+            FullDateTimePattern = "dddd, dd MMMM yyyy - hh:mm:ss tt"
+            LongDatePattern     = "dddd, dd MMMM yyyy"
+            LongTimePattern     = "hh:mm:ss tt"
+            MonthDayPattern     = "dd MMMM"
+            ShortDatePattern    = "yyyy-MM-dd"
+            ShortTimePattern    = "hh:mm tt"
+        }
+        CultureEnglishName      = "English (United Kingdom) - Modified"
+        CultureNativeName       = "English (United Kingdom) - Modified"
+    }
+
+    try {
+        # Set up CultureAndRegionInfoBuilder
+        Add-Type -AssemblyName sysglobl
+        $CultureBuilder = New-Object System.Globalization.CultureAndRegionInfoBuilder @($CultureName, [System.Globalization.CultureAndRegionModifiers]::None)
+        $CultureBuilder.LoadDataFromCultureInfo($BaseCulture)
+        $CultureBuilder.LoadDataFromRegionInfo($BaseRegion)
+        # Make appropriate changes
+        foreach ($Property in $Changes.Keys) {
+            if (($CultureBuilder.$Property -is [string]) -or ($CultureBuilder.$Property -is [int])) {
+                $CultureBuilder.$Property = $Changes[$Property]
+            }
+            else {
+                foreach ($item in $Changes.$Property.Keys) {
+                    $CultureBuilder.$Property.$item = $Changes.$Property.$item
+                }
+            }
+        }
+        # Register your new culture
+        $CultureBuilder.Register()
+        Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Culture: '$CultureName' created successfully" -EventId 0
+    }
+    catch {
+        Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message "Unable to create culture: '$CultureName'" -EventId 1003
+        Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message $Error[0] -EventId 1003
+        Exit 1
+    }
+}
+else {
+    Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Culture: '$CultureName' already exists" -EventId 0
 }
 
 # Check if Language Pack is installed and install if not
@@ -95,45 +156,3 @@ if (-not ((Get-SystemPreferredUILanguage) -eq $DesiredLanguage)) {
 else {
     Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "SystemPreferredUILanguage already set to $DesiredLanguage" -EventId 0
 }
-
-# $CultureName = "ABYSS-ORG-UK_$DesiredLanguage"
-# $BaseCulture = [cultureinfo]::GetCultureInfo($DesiredLanguage)
-# $BaseRegion = New-Object System.Globalization.RegionInfo "$DesiredRegion"
-# $Changes = @{
-#     GregorianDateTimeFormat = [Hashtable]@{
-#         FullDateTimePattern = "dddd, dd MMMM yyyy - hh:mm:ss tt"
-#         LongDatePattern     = "dddd, dd MMMM yyyy"
-#         LongTimePattern     = "hh:mm:ss tt"
-#         MonthDayPattern     = "dd MMMM"
-#         ShortDatePattern    = "yyyy-MM-dd"
-#         ShortTimePattern    = "hh:mm tt"
-#     }
-# }
-
-# try {
-#     # Set up CultureAndRegionInfoBuilder
-#     Add-Type -AssemblyName sysglobl
-#     $CultureBuilder = New-Object System.Globalization.CultureAndRegionInfoBuilder @($CultureName, [System.Globalization.CultureAndRegionModifiers]::None)
-#     $CultureBuilder.LoadDataFromCultureInfo($BaseCulture)
-#     $CultureBuilder.LoadDataFromRegionInfo($BaseRegion)
-
-
-#     # Make appropriate changes
-#     foreach ($Property in $Changes.Keys) {
-#         if (($CultureBuilder.$Property -is [string]) -or ($CultureBuilder.$Property -is [int])) {
-#             $CultureBuilder.$Property = $Changes[$Property]
-#         }
-#         else {
-#             foreach ($item in $Changes.$Property.Keys) {
-#                 $CultureBuilder.$Property.$item = $Changes.$Property.$item
-#             }
-#         }
-#     }
-
-#     # Register your new culture
-#     $CultureBuilder.Register()
-
-# }
-# catch {
-#     throw
-# }
