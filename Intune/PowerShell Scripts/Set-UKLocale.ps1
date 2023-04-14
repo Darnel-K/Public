@@ -3,7 +3,7 @@
  * Filename: \Intune\PowerShell Scripts\Set-UKLocale.ps1
  * Repository: Public
  * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Friday, April 14th 2023, 5:13:41 PM
+ * Last Modified: Friday, April 14th 2023, 5:15:00 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -237,7 +237,7 @@ try {
     Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Copied locale settings to system" -EventId 0
 }
 catch {
-    Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message "Unable copy locale settings to system" -EventId 1004
+    Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message "Unable to copy locale settings to system" -EventId 1004
     Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message $Error[0] -EventId 1004
 }
 Exit 0
