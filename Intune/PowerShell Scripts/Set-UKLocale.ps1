@@ -3,7 +3,7 @@
  * Filename: \Intune\PowerShell Scripts\Set-UKLocale.ps1
  * Repository: Public
  * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Friday, April 14th 2023, 3:54:14 PM
+ * Last Modified: Friday, April 14th 2023, 4:06:29 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -157,6 +157,31 @@ else {
     Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "SystemPreferredUILanguage already set to $DesiredLanguage" -EventId 0
 }
 
+# Check if WinSystemLocale is set to $DesiredLanguage
+Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Checking if WinSystemLocale is set to $DesiredLanguage" -EventId 0
+if (-not ((Get-WinSystemLocale).Name -eq $DesiredLanguage)) {
+    Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "WinSystemLocale not set to $DesiredLanguage" -EventId 0
+    try {
+        Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Attempting to set WinSystemLocale to $DesiredLanguage" -EventId 0
+        Set-WinSystemLocale -SystemLocale $DesiredLanguage
+        if ((Get-WinSystemLocale).Name -eq $DesiredLanguage) {
+            Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "WinSystemLocale set to $DesiredLanguage successfully" -EventId 0
+        }
+        else {
+            Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message "Unable to set WinSystemLocale to $DesiredLanguage" -EventId 1007
+            Exit 1
+        }
+    }
+    catch {
+        Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message "Unable to set WinSystemLocale to $DesiredLanguage" -EventId 1007
+        Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message $Error[0] -EventId 1007
+        Exit 1
+    }
+}
+else {
+    Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "WinSystemLocale already set to $DesiredLanguage" -EventId 0
+}
+
 # Check if WinHomeLocation is set to United Kingdom
 Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Checking if WinHomeLocation is set to United Kingdom" -EventId 0
 if (-not ((Get-WinHomeLocation).GeoId -eq 242)) {
@@ -182,31 +207,6 @@ else {
     Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "WinHomeLocation already set to United Kingdom" -EventId 0
 }
 
-# Check if WinSystemLocale is set to $CultureName
-Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Checking if WinSystemLocale is set to $CultureName" -EventId 0
-if (-not ((Get-WinSystemLocale).Name -eq $CultureName)) {
-    Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "WinSystemLocale not set to $CultureName" -EventId 0
-    try {
-        Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Attempting to set WinSystemLocale to $CultureName" -EventId 0
-        Set-WinSystemLocale -SystemLocale $CultureName
-        if ((Get-WinSystemLocale).Name -eq $CultureName) {
-            Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "WinSystemLocale set to $CultureName successfully" -EventId 0
-        }
-        else {
-            Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message "Unable to set WinSystemLocale to $CultureName" -EventId 1007
-            Exit 1
-        }
-    }
-    catch {
-        Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message "Unable to set WinSystemLocale to $CultureName" -EventId 1007
-        Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message $Error[0] -EventId 1007
-        Exit 1
-    }
-}
-else {
-    Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "WinSystemLocale already set to $CultureName" -EventId 0
-}
-
 # Set user culture
 try {
     Set-Culture $CultureName
@@ -220,7 +220,6 @@ catch {
 
 # Copy locale settings to system
 try {
-    Set-Culture $CultureName
     Copy-UserInternationalSettingsToSystem -WelcomeScreen $True -NewUser $True
     Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Copied locale settings to system" -EventId 0
 }
