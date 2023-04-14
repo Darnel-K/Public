@@ -3,7 +3,7 @@
  * Filename: \Intune\PowerShell Scripts\Set-UKLocale.ps1
  * Repository: Public
  * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Friday, April 14th 2023, 4:06:29 PM
+ * Last Modified: Friday, April 14th 2023, 5:13:41 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -205,6 +205,19 @@ if (-not ((Get-WinHomeLocation).GeoId -eq 242)) {
 }
 else {
     Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "WinHomeLocation already set to United Kingdom" -EventId 0
+}
+
+# Uninstall other language packs
+$OtherLanguagePacks = (Get-InstalledLanguage) | Where-Object { $_.LanguageId -ne $DesiredLanguage }
+foreach ($item in $OtherLanguagePacks) {
+    try {
+        Uninstall-Language -Language $item.LanguageId
+        Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Uninstalled '$($item.LanguageId)' Language Pack successfully" -EventId 0
+    }
+    catch {
+        Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message "Unable to uninstall '$($item.LanguageId)' Language Pack" -EventId 1008
+        Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message $Error[0] -EventId 1008
+    }
 }
 
 # Set user culture
