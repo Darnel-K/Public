@@ -1,9 +1,20 @@
+<#
+ * ############################################################################
+ * Filename: \Intune\Win32 Apps\BGInfo\install.ps1
+ * Repository: Public
+ * Created Date: Monday, March 27th 2023, 2:21:32 PM
+ * Last Modified: Monday, May 15th 2023, 11:00:36 PM
+ * Original Author: Darnel Kumar
+ * Author Github: https://github.com/Darnel-K
+ *
+ * Copyright (c) 2023 Darnel Kumar
+ * ############################################################################
+#>
 New-Item -ItemType Directory -Force -Path "c:\Program Files\BGInfo" | Out-Null
 #Start-BitsTransfer -Source "https://live.sysinternals.com/Bginfo64.exe" -Destination "C:\Program Files\BGInfo"
 Copy-Item -Path "$PSScriptRoot\Bginfo64.exe" -Destination "C:\Program Files\BGInfo\Bginfo64.exe"
 Copy-Item -Path "$PSScriptRoot\Config.bgi" -Destination "C:\Program Files\BGInfo\Config.bgi"
-Copy-Item -Path "$PSScriptRoot\Wallpaper.jpg" -Destination "C:\Program Files\BGInfo\Wallpaper.jpg"
-Copy-Item -Path "$PSScriptRoot\Production1.txt" -Destination "C:\Program Files\BGInfo\Production1.txt"
+# Copy-Item -Path "$PSScriptRoot\Wallpaper.jpg" -Destination "C:\Program Files\BGInfo\Wallpaper.jpg"
 
 $Shell = New-Object -ComObject ("WScript.Shell")
 $ShortCut = $Shell.CreateShortcut("C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp\BGInfo.lnk")
