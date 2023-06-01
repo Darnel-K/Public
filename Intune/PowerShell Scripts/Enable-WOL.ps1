@@ -3,7 +3,7 @@
  * Filename: \Intune\PowerShell Scripts\Enable-WOL.ps1
  * Repository: Public
  * Created Date: Thursday, June 1st 2023, 2:47:39 PM
- * Last Modified: Thursday, June 1st 2023, 4:17:57 PM
+ * Last Modified: Thursday, June 1st 2023, 4:48:04 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -18,3 +18,4 @@ foreach ($item in $NetAdapters) {
 }
 
 Enable-NetAdapterPowerManagement -Name * -WakeOnMagicPacket -WakeOnPattern
+Exit 0
