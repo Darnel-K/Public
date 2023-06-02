@@ -3,7 +3,7 @@
  * Filename: \Intune\Win32 Apps\IOTLink\Add-IntuneWin32App.IOTLink.ps1
  * Repository: Public
  * Created Date: Sunday, March 12th 2023, 2:18:06 PM
- * Last Modified: Friday, June 2nd 2023, 12:00:47 PM
+ * Last Modified: Friday, June 2nd 2023, 3:14:57 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -18,8 +18,6 @@
     Script for an Intune Win32 to install IOTLink silently
 .NOTES
     Not supported on linux
-.LINK
-    https://github.com/Darnel-K/Public/blob/master/Intune/Win32%20Apps/IOTLink/README.md
 .EXAMPLE
     & .\Add-IntuneWin32App.IOTLink.ps1
 #>
