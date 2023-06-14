@@ -3,7 +3,7 @@
  * Filename: \Intune\Win32 Apps\IOTLink\Add-IntuneWin32App.IOTLink.ps1
  * Repository: Public
  * Created Date: Sunday, March 12th 2023, 2:18:06 PM
- * Last Modified: Friday, June 2nd 2023, 6:23:09 PM
+ * Last Modified: Wednesday, June 14th 2023, 10:43:04 AM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -46,8 +46,8 @@ begin {
 process {
     try {
         Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Starting IOTLink installation" -EventId 0
-        Start-Process -FilePath ".\IOTLink_Installer_v2.2.2.exe" -Wait -WindowStyle Hidden -ArgumentList "/SILENT /VERYSILENT /FORCECLOSEAPPLICATIONS /RESTARTAPPLICATIONS /SUPPRESSMSGBOXES" -Verb RunAs
-        Start-Process -FilePath "$(${env:ProgramFiles(x86)})\IOTLink\IOTLinkService.exe" -Wait -WindowStyle Hidden -ArgumentList "-install" -Verb RunAs
+        Start-Process -FilePath ".\IOTLink_Installer_v2.2.2.exe" -Wait -ArgumentList "/SILENT /VERYSILENT" -Verb RunAs
+        # Start-Process -FilePath "$(${env:ProgramFiles(x86)})\IOTLink\IOTLinkService.exe" -Wait -WindowStyle Hidden -ArgumentList "-install" -Verb RunAs
         if (Test-Path "$(${env:ProgramFiles(x86)})\IOTLink\IOTLinkService.exe" -PathType Leaf) {
             Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "IOTLink installation complete" -EventId 0
             Exit 0
