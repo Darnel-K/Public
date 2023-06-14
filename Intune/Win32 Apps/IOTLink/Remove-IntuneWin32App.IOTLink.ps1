@@ -3,7 +3,7 @@
  * Filename: \Intune\Win32 Apps\IOTLink\Remove-IntuneWin32App.IOTLink.ps1
  * Repository: Public
  * Created Date: Sunday, March 12th 2023, 2:18:06 PM
- * Last Modified: Friday, June 2nd 2023, 6:23:13 PM
+ * Last Modified: Wednesday, June 14th 2023, 10:44:00 AM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -46,7 +46,7 @@ begin {
 process {
     try {
         Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Starting IOTLink uninstallation" -EventId 0
-        Start-Process -FilePath "$(${env:ProgramFiles(x86)})\IOTLink\unins000.exe" -Wait -WindowStyle Hidden -ArgumentList "/SILENT /VERYSILENT /SUPPRESSMSGBOXES" -Verb RunAs
+        Start-Process -FilePath "$(${env:ProgramFiles(x86)})\IOTLink\unins000.exe" -Wait -WindowStyle Hidden -ArgumentList "/SILENT /VERYSILENT" -Verb RunAs
         if (-not (Test-Path "$(${env:ProgramFiles(x86)})\IOTLink\IOTLinkService.exe" -PathType Leaf)) {
             Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "IOTLink uninstallation complete" -EventId 0
             Exit 0
