@@ -2,8 +2,8 @@
  * ############################################################################
  * Filename: \Intune\PowerShell Scripts\Disable-IPv6.ps1
  * Repository: Public
- * Created Date: Wednesday, June 14th 2023, 9:52:14 AM
- * Last Modified: Monday, August 14th 2023, 12:44:19 PM
+ * Created Date: Monday, August 14th 2023, 12:26:40 PM
+ * Last Modified: Monday, August 14th 2023, 2:13:42 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -23,7 +23,7 @@ begin {
     $ProgressPreference = "Continue"
     $host.ui.RawUI.WindowTitle = $MyInvocation.MyCommand.Name
     # Update LogName and LogSource
-    $LogName = "ABYSS.ORG.UK"; $LogSource = ".Intune.PSScript.Disable-IPv6";
+    $LogName = "ABYSS.ORG.UK"; $LogSource = ".Intune.PSScript.DisableIPv6";
     if (-not ([System.Diagnostics.EventLog]::Exists($LogName)) -or -not ([System.Diagnostics.EventLog]::SourceExists($LogSource))) {
         try {
             New-EventLog -LogName $LogName -Source $LogSource
