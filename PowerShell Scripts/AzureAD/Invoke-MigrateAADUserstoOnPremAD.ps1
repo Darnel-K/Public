@@ -3,7 +3,7 @@
  * Filename: \PowerShell Scripts\AzureAD\Invoke-MigrateAADUserstoOnPremAD.ps1
  * Repository: Public
  * Created Date: Monday, August 14th 2023, 12:26:40 PM
- * Last Modified: Monday, August 14th 2023, 12:29:47 PM
+ * Last Modified: Monday, August 14th 2023, 2:13:42 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -36,18 +36,11 @@
     A sample command that uses the function or script, optionally followed by sample output and a description. Repeat this keyword for each example.
 #>
 
-[CmdletBinding()]
-Param (
-    [Parameter(Position = 0, Mandatory = $true, ValueFromPipeline = $true)]
-    [string]
-    # The short description of a parameter. For a longer description use the Comment-Help block at the top of this script.
-    $Param1
-)
 begin {
     $ProgressPreference = "Continue"
     $host.ui.RawUI.WindowTitle = $MyInvocation.MyCommand.Name
     # Update LogName and LogSource
-    $LogName = "ABYSS.ORG.UK"; $LogSource = "";
+    $LogName = "ABYSS.ORG.UK"; $LogSource = ".Intune.PSScript.";
     if (-not ([System.Diagnostics.EventLog]::Exists($LogName)) -or -not ([System.Diagnostics.EventLog]::SourceExists($LogSource))) {
         try {
             New-EventLog -LogName $LogName -Source $LogSource
