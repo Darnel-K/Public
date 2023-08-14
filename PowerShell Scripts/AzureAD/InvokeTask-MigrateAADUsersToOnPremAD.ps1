@@ -1,9 +1,9 @@
 <#
  * ############################################################################
- * Filename: \PowerShell Scripts\AzureAD\Invoke-MigrateAADUserstoOnPremAD.ps1
+ * Filename: \PowerShell Scripts\AzureAD\InvokeTask-MigrateAADUsersToOnPremAD.ps1
  * Repository: Public
  * Created Date: Monday, August 14th 2023, 12:26:40 PM
- * Last Modified: Monday, August 14th 2023, 2:17:25 PM
+ * Last Modified: Monday, August 14th 2023, 2:19:03 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -44,13 +44,13 @@ begin {
     if (-not ([System.Diagnostics.EventLog]::Exists($LogName)) -or -not ([System.Diagnostics.EventLog]::SourceExists($LogSource))) {
         try {
             New-EventLog -LogName $LogName -Source $LogSource
-            Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Initialised Event Log: $LogSource" -EventId 1
+            Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Initialised Event Log: $LogSource" -EventId 0
         }
         catch {
             $Message = "Unable to initialise event log '$LogName' with source '$LogSource', falling back to event log 'Application' with source 'Application'"
             $LogName = "Application"; $LogSource = "Application"; # DO NOT CHANGE
-            Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message $Message -EventId 1000
-            Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message $Error[0] -EventId 1000
+            Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message $Message -EventId 0
+            Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message $Error[0] -EventId 0
         }
     }
     # Add any code here that needs be done once during the initialisation phase
