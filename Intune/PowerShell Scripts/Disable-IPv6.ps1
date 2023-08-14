@@ -3,7 +3,7 @@
  * Filename: \Intune\PowerShell Scripts\Disable-IPv6.ps1
  * Repository: Public
  * Created Date: Wednesday, June 14th 2023, 9:52:14 AM
- * Last Modified: Monday, August 14th 2023, 12:37:40 PM
+ * Last Modified: Monday, August 14th 2023, 12:44:19 PM
  * Original Author: Darnel Kumar
  * Author Github: https://github.com/Darnel-K
  *
@@ -39,5 +39,14 @@ begin {
 }
 
 process {
-    Disable-NetAdapterBinding -Name "*" -ComponentID ms_tcpip6
+    try {
+        Disable-NetAdapterBinding -Name "*" -ComponentID ms_tcpip6
+        Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Disabled IPv6 on all network devices." -EventId 0
+        Exit 0
+    }
+    catch {
+        Write-EventLog -LogName $LogName -Source $LogSource -EntryType Error -Message "Unable to disable IPv6" -EventId 0
+        Write-EventLog -LogName $LogName -Source $LogSource -EntryType Error -Message $Error[0] -EventId 0
+        Exit 1
+    }
 }
