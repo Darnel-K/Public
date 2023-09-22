@@ -100,6 +100,7 @@ begin {
     $DistGroups = @()
     $PSModules = @("ThreadJob", "ExchangeOnlineManagement")
 
+    Write-Host "Checking if required modules are installed..."
     if ((Get-PackageProvider -Name NuGet)) {
         Write-Host "[INSTALLED] - NuGet" -ForegroundColor Green
     }
@@ -192,210 +193,327 @@ process {
     }
     if ($AllMailboxes.Count -gt 0) {
         Write-Host "Checking Mailbox Permissions"
-        $syncHash = [hashtable]::Synchronized(@{})
-        $syncHash.i = 0
         $jobs = @()
         foreach ($item in $AllMailboxes) {
-            $jobs += Start-ThreadJob -Name $item.Mailbox.UserPrincipalName -StreamingHost $Host -ScriptBlock {
-                $syncHash.i++
-                $mb = $using:item
-                Write-Host "UPN: "$mb.Mailbox.GUID
-                Write-Host "I: "$using:syncHash.i
+            $jobs += Start-ThreadJob -Name CheckMailboxPermissions -StreamingHost $Host -ScriptBlock {
+                Connect-ExchangeOnline
+                $item = $using:item
+                $Trustee = $using:Trustee
+                $TrusteeObj = $using:TrusteeObj
+                $Identity = $using:Identity
+                Get-PSSession
+                if ($item.Type -eq "Mailbox") {
+                    try {
+                        if ($Identity -and -not $Trustee) {
+                            $rp = Get-RecipientPermission -Identity $item.Mailbox.GUID
+                            $mp = Get-MailboxPermission -Identity $item.Mailbox.GUID
+                        }
+                        elseif (($Trustee -and -not $Identity) -or ($Identity -and $Trustee)) {
+                            $rp = Get-RecipientPermission -Identity $item.Mailbox.GUID -Trustee $TrusteeObj.GUID
+                            $mp = Get-MailboxPermission -Identity $item.Mailbox.GUID -User $TrusteeObj.GUID
+                        }
+                        else {
+                            Write-Error "-Identity or -Trustee parameter not specified, one or both of these parameters must be specified."
+                            Exit 1
+                        }
+                    }
+                    catch {
+                        Write-Warning "Failed checking '$($item.UserPrincipalName)' permissions"
+                        Write-Warning $Error[0]
+                    }
+                    if ($null -ne $rp) {
+                        foreach ($rpItem in $rp) {
+                            $tguid = $null
+                            if (-not ($rpItem.Trustee -eq "NT AUTHORITY\SELF")) { $tguid = (Get-Mailbox -Identity $rpItem.Trustee -ErrorAction SilentlyContinue ).GUID }
+                            $Results += [PSCustomObject]@{
+                                GUID         = $item.Mailbox.GUID
+                                Identity     = $item.Mailbox.UserPrincipalName
+                                Trustee      = $rpItem.Trustee
+                                TrusteeGUID  = $tguid
+                                AccessRights = $rpItem.AccessRights
+                            }
+                        }
+
+                    }
+                    if ($null -ne $mp) {
+                        foreach ($mpItem in $mp) {
+                            $tguid = $null
+                            if (-not ($mpItem.User -eq "NT AUTHORITY\SELF")) { $tguid = (Get-Mailbox -Identity $mpItem.User -ErrorAction SilentlyContinue ).GUID }
+                            $Results += [PSCustomObject]@{
+                                GUID         = $item.Mailbox.GUID
+                                Identity     = $item.Mailbox.UserPrincipalName
+                                Trustee      = $mpItem.User
+                                TrusteeGUID  = $tguid
+                                AccessRights = $mpItem.AccessRights
+                            }
+                        }
+
+                    }
+                    if ( $Trustee -and ((($TrusteeObj.DisplayName) -in $item.Mailbox.GrantSendOnBehalfTo)) -or (($TrusteeObj.ExternalDirectoryObjectID ) -in $item.Mailbox.GrantSendOnBehalfTo)) {
+                        $Results += [PSCustomObject]@{
+                            GUID         = $item.Mailbox.GUID
+                            Identity     = $item.Mailbox.UserPrincipalName
+                            Trustee      = $TrusteeObj.UserPrincipalName
+                            TrusteeGUID  = $TrusteeObj.GUID
+                            AccessRights = "SendOnBehalf"
+                        }
+                    }
+                    elseif (!($Trustee) -and $item.Mailbox.GrantSendOnBehalfTo) {
+                        foreach ($sobItem in ($item.Mailbox.GrantSendOnBehalfTo).Split(",")) {
+                            if ( $TrusteeObj = Get-Mailbox -Identity $sobItem) {
+                                $Results += [PSCustomObject]@{
+                                    GUID         = $item.Mailbox.GUID
+                                    Identity     = $item.Mailbox.UserPrincipalName
+                                    Trustee      = $TrusteeObj.UserPrincipalName
+                                    TrusteeGUID  = $TrusteeObj.GUID
+                                    AccessRights = "SendOnBehalf"
+                                }
+                            }
+                            else {
+                                $Results += [PSCustomObject]@{
+                                    GUID         = $item.Mailbox.GUID
+                                    Identity     = $item.Mailbox.UserPrincipalName
+                                    Trustee      = $sobItem
+                                    TrusteeGUID  = $null
+                                    AccessRights = "SendOnBehalf"
+                                }
+                            }
+                        }
+                    }
+                }
+                elseif ($item.Type -eq "Group") {
+                    $Members = Get-DistributionGroupMember -Identity $item.Mailbox.GUID -IncludeSoftDeletedObjects -ResultSize Unlimited
+                    if ($Trustee) {
+                        foreach ($m in $Members) {
+                            if ($m.PrimarySmtpAddress -contains $TrusteeObj.UserPrincipalName) {
+                                $Results += [PSCustomObject]@{
+                                    GUID         = $item.Mailbox.GUID
+                                    Identity     = $item.Mailbox.PrimarySmtpAddress
+                                    Trustee      = $m.PrimarySmtpAddress
+                                    TrusteeGUID  = $m.GUID
+                                    AccessRights = "Member"
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        foreach ($m in $Members) {
+                            $Results += [PSCustomObject]@{
+                                GUID         = $item.Mailbox.GUID
+                                Identity     = $item.Mailbox.PrimarySmtpAddress
+                                Trustee      = $m.PrimarySmtpAddress
+                                TrusteeGUID  = $m.GUID
+                                AccessRights = "Member"
+                            }
+                        }
+                    }
+                }
+                else {
+                    Write-Host "Unrecongnised mailbox type: "$item.Type
+                }
             }
         }
-        Wait-Job -Job $jobs
+        Write-Host "Waiting for processing to finish..."
+        while (($jobs | Where-Object -Property State -ne -Value "Completed" ).Count -gt 0) {
+            $PercentComplete = (($jobs | Where-Object -Property State -eq -Value "Completed" ).Count / ($jobs).Count) * 100
+            Write-Progress -Id 0 -Activity "Processing Mailbox Permissions and Distribution / Mail-Enabled Security Group Membership" -Status "$([math]::Round($PercentComplete))% Complete" -PercentComplete $PercentComplete
+        }
+        $test = Receive-Job -Name CheckMailboxPermissions -Keep
+        # Wait-Job -Job $jobs
+        Write-Output $test
+        Remove-Job -Job $jobs
     }
 
 
 
-    # if ($Mailboxes.Count -gt 0) {
-    #     Write-Host "Checking Mailbox Permissions"
-    #     $i = 0
-    #     foreach ($item in $Mailboxes) {
-    #         # Generate progress bar
-    #         $i++
-    #         $PercentComplete = ($i / $Mailboxes.count) * 100
-    #         Write-Progress -Id 0 -Activity "Checking Mailbox Permissions" -Status "$([math]::Round($PercentComplete))% Complete" -PercentComplete $PercentComplete -CurrentOperation "Checking Mailbox: $($item.UserPrincipalName)"
-    #         try {
-    #             if ($Identity -and -not $Trustee) {
-    #                 $rp = Get-RecipientPermission -Identity $item.GUID
-    #                 $mp = Get-MailboxPermission -Identity $item.GUID
-    #             }
-    #             elseif (($Trustee -and -not $Identity) -or ($Identity -and $Trustee)) {
-    #                 $rp = Get-RecipientPermission -Identity $item.GUID -Trustee $TrusteeObj.GUID
-    #                 $mp = Get-MailboxPermission -Identity $item.GUID -User $TrusteeObj.GUID
-    #             }
-    #             else {
-    #                 Write-Error "-Identity or -Trustee parameter not specified, one or both of these parameters must be specified."
-    #                 Exit 1
-    #             }
-    #         }
-    #         catch {
-    #             Write-Warning "Failed checking '$($item.UserPrincipalName)' permissions"
-    #             Write-Warning $Error[0]
-    #         }
-    #         if ($null -ne $rp) {
-    #             foreach ($rpItem in $rp) {
-    #                 $tguid = $null
-    #                 if (-not ($rpItem.Trustee -eq "NT AUTHORITY\SELF")) { $tguid = (Get-Mailbox -Identity $rpItem.Trustee -ErrorAction SilentlyContinue ).GUID }
-    #                 $Results += [PSCustomObject]@{
-    #                     GUID         = $item.GUID
-    #                     Identity     = $item.UserPrincipalName
-    #                     Trustee      = $rpItem.Trustee
-    #                     TrusteeGUID  = $tguid
-    #                     AccessRights = $rpItem.AccessRights
-    #                 }
-    #             }
+    if ($Mailboxes.Count -gt 0) {
+        # Write-Host "Checking Mailbox Permissions"
+        # $i = 0
+        foreach ($item in $Mailboxes) {
+            # Generate progress bar
+            # $i++
+            # $PercentComplete = ($i / $Mailboxes.count) * 100
+            # Write-Progress -Id 0 -Activity "Checking Mailbox Permissions" -Status "$([math]::Round($PercentComplete))% Complete" -PercentComplete $PercentComplete -CurrentOperation "Checking Mailbox: $($item.UserPrincipalName)"
+            # try {
+            #     if ($Identity -and -not $Trustee) {
+            #         $rp = Get-RecipientPermission -Identity $item.GUID
+            #         $mp = Get-MailboxPermission -Identity $item.GUID
+            #     }
+            #     elseif (($Trustee -and -not $Identity) -or ($Identity -and $Trustee)) {
+            #         $rp = Get-RecipientPermission -Identity $item.GUID -Trustee $TrusteeObj.GUID
+            #         $mp = Get-MailboxPermission -Identity $item.GUID -User $TrusteeObj.GUID
+            #     }
+            #     else {
+            #         Write-Error "-Identity or -Trustee parameter not specified, one or both of these parameters must be specified."
+            #         Exit 1
+            #     }
+            # }
+            # catch {
+            #     Write-Warning "Failed checking '$($item.UserPrincipalName)' permissions"
+            #     Write-Warning $Error[0]
+            # }
+            # if ($null -ne $rp) {
+            #     foreach ($rpItem in $rp) {
+            #         $tguid = $null
+            #         if (-not ($rpItem.Trustee -eq "NT AUTHORITY\SELF")) { $tguid = (Get-Mailbox -Identity $rpItem.Trustee -ErrorAction SilentlyContinue ).GUID }
+            #         $Results += [PSCustomObject]@{
+            #             GUID         = $item.GUID
+            #             Identity     = $item.UserPrincipalName
+            #             Trustee      = $rpItem.Trustee
+            #             TrusteeGUID  = $tguid
+            #             AccessRights = $rpItem.AccessRights
+            #         }
+            #     }
 
-    #         }
-    #         if ($null -ne $mp) {
-    #             foreach ($mpItem in $mp) {
-    #                 $tguid = $null
-    #                 if (-not ($mpItem.User -eq "NT AUTHORITY\SELF")) { $tguid = (Get-Mailbox -Identity $mpItem.User -ErrorAction SilentlyContinue ).GUID }
-    #                 $Results += [PSCustomObject]@{
-    #                     GUID         = $item.GUID
-    #                     Identity     = $item.UserPrincipalName
-    #                     Trustee      = $mpItem.User
-    #                     TrusteeGUID  = $tguid
-    #                     AccessRights = $mpItem.AccessRights
-    #                 }
-    #             }
+            # }
+            # if ($null -ne $mp) {
+            #     foreach ($mpItem in $mp) {
+            #         $tguid = $null
+            #         if (-not ($mpItem.User -eq "NT AUTHORITY\SELF")) { $tguid = (Get-Mailbox -Identity $mpItem.User -ErrorAction SilentlyContinue ).GUID }
+            #         $Results += [PSCustomObject]@{
+            #             GUID         = $item.GUID
+            #             Identity     = $item.UserPrincipalName
+            #             Trustee      = $mpItem.User
+            #             TrusteeGUID  = $tguid
+            #             AccessRights = $mpItem.AccessRights
+            #         }
+            #     }
 
-    #         }
-    #         if ( $Trustee -and ((($TrusteeObj.DisplayName) -in $item.GrantSendOnBehalfTo)) -or (($TrusteeObj.ExternalDirectoryObjectID ) -in $item.GrantSendOnBehalfTo)) {
-    #             $Results += [PSCustomObject]@{
-    #                 GUID         = $item.GUID
-    #                 Identity     = $item.UserPrincipalName
-    #                 Trustee      = $TrusteeObj.UserPrincipalName
-    #                 TrusteeGUID  = $TrusteeObj.GUID
-    #                 AccessRights = "SendOnBehalf"
-    #             }
-    #         }
-    #         elseif (!($Trustee) -and $item.GrantSendOnBehalfTo) {
-    #             foreach ($sobItem in ($item.GrantSendOnBehalfTo).Split(",")) {
-    #                 if ( $TrusteeObj = Get-Mailbox -Identity $sobItem) {
-    #                     $Results += [PSCustomObject]@{
-    #                         GUID         = $item.GUID
-    #                         Identity     = $item.UserPrincipalName
-    #                         Trustee      = $TrusteeObj.UserPrincipalName
-    #                         TrusteeGUID  = $TrusteeObj.GUID
-    #                         AccessRights = "SendOnBehalf"
-    #                     }
-    #                 }
-    #                 else {
-    #                     $Results += [PSCustomObject]@{
-    #                         GUID         = $item.GUID
-    #                         Identity     = $item.UserPrincipalName
-    #                         Trustee      = $sobItem
-    #                         TrusteeGUID  = $null
-    #                         AccessRights = "SendOnBehalf"
-    #                     }
-    #                 }
-    #             }
-    #         }
-    #     }
-    #     Write-Host "Completed Mailbox Permissions Check" -ForegroundColor Green
-    # }
-    # if ($DistGroups.Count -gt 0) {
-    #     Write-Host "Checking Distribution / Mail-Enabled Security Group Membership"
-    #     $i = 0
-    #     foreach ($item in $DistGroups) {
-    #         # Generate progress bar
-    #         $i++
-    #         $PercentComplete = ($i / $DistGroups.count) * 100
-    #         Write-Progress -Id 0 -Activity "Checking Distribution / Mail-Enabled Security Group Membership" -Status "$([math]::Round($PercentComplete))% Complete" -PercentComplete $PercentComplete -CurrentOperation "Checking Distribution / Mail-Enabled Security Group: $($item.PrimarySmtpAddress)"
-    #         $Members = Get-DistributionGroupMember -Identity $item.GUID -IncludeSoftDeletedObjects -ResultSize Unlimited
-    #         if ($Trustee) {
-    #             foreach ($m in $Members) {
-    #                 if ($m.PrimarySmtpAddress -contains $TrusteeObj.UserPrincipalName) {
-    #                     $Results += [PSCustomObject]@{
-    #                         GUID         = $item.GUID
-    #                         Identity     = $item.PrimarySmtpAddress
-    #                         Trustee      = $m.PrimarySmtpAddress
-    #                         TrusteeGUID  = $m.GUID
-    #                         AccessRights = "Member"
-    #                     }
-    #                 }
-    #             }
-    #         }
-    #         else {
-    #             foreach ($m in $Members) {
-    #                 $Results += [PSCustomObject]@{
-    #                     GUID         = $item.GUID
-    #                     Identity     = $item.PrimarySmtpAddress
-    #                     Trustee      = $m.PrimarySmtpAddress
-    #                     TrusteeGUID  = $m.GUID
-    #                     AccessRights = "Member"
-    #                 }
-    #             }
-    #         }
-    #     }
-    #     Write-Host "Completed Distribution / Mail-Enabled Security Group Membership Check" -ForegroundColor Green
-    # }
-    # if ($RevokeTrusteeAccess -eq $true) {
-    #     Write-Host "Removing Mailbox Permissions & Group Membership"
-    #     $i = 0
-    #     foreach ($item in $Results) {
-    #         # Generate progress bar
-    #         $i++
-    #         $PercentComplete = ($i / $Results.count) * 100
-    #         Write-Progress -Id 0 -Activity "Removing Mailbox Permissions & Group Membership" -Status "$([math]::Round($PercentComplete))% Complete" -PercentComplete $PercentComplete -CurrentOperation "Removing Trustee Permission '$($item.AccessRights)' for '$($item.Trustee)' from '$($item.Identity)'"
-    #         if (-not ($null -eq $item.TrusteeGUID)) {
-    #             switch -Wildcard ($item.AccessRights) {
-    #                 "*SendOnBehalf*" {
-    #                     try {
-    #                         Set-Mailbox -Identity $item.GUID -GrantSendOnBehalfTo @{remove = "$($item.TrusteeGUID)" } -Confirm:$false -ErrorAction Stop
-    #                         Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue $true
-    #                     }
-    #                     catch {
-    #                         Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue "FAILED"
-    #                         Write-Warning "Unable to remove permission '$($item.AccessRights)' for '$($item.Trustee)' from '$($item.Identity)'"
-    #                         Write-Warning "This may need to be done manually from the on-premise Active Directory server or Exchange Online admin center"
-    #                     }
-    #                 }
-    #                 "*SendAs*" {
-    #                     try {
-    #                         Remove-RecipientPermission  -Identity $item.GUID -Trustee $item.TrusteeGUID -AccessRights SendAs -Confirm:$false -ErrorAction Stop
-    #                         Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue $true
-    #                     }
-    #                     catch {
-    #                         Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue "FAILED"
-    #                         Write-Warning "Unable to remove permission '$($item.AccessRights)' for '$($item.Trustee)' from '$($item.Identity)'"
-    #                         Write-Warning "This may need to be done manually from the on-premise Active Directory server or Exchange Online admin center"
-    #                     }
-    #                     break
-    #                 }
-    #                 "*Member*" {
-    #                     try {
-    #                         Remove-DistributionGroupMember -Identity $item.GUID -Member $item.TrusteeGUID -BypassSecurityGroupManagerCheck -Confirm:$false -ErrorAction Stop
-    #                         Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue $true
-    #                     }
-    #                     catch {
-    #                         Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue "FAILED"
-    #                         Write-Warning "Unable to remove membership for '$($item.Trustee)' from '$($item.Identity)'"
-    #                         Write-Warning "This may need to be done manually from the on-premise Active Directory server or Exchange Online admin center"
-    #                     }
-    #                     break
-    #                 }
-    #                 "*FullAccess*" {
-    #                     try {
-    #                         Remove-MailboxPermission -Identity $item.GUID -User $item.TrusteeGUID -AccessRights FullAccess, SendAs, ExternalAccount, DeleteItem, ReadPermission, ChangePermission, ChangeOwner -InheritanceType All -Confirm:$false -ErrorAction Stop
-    #                         Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue $true
-    #                     }
-    #                     catch {
-    #                         Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue "FAILED"
-    #                         Write-Warning "Unable to remove permission '$($item.AccessRights)' for '$($item.Trustee)' from '$($item.Identity)'"
-    #                         Write-Warning "This may need to be done manually from the on-premise Active Directory server or Exchange Online admin center"
-    #                     }
-    #                     break
-    #                 }
-    #             }
-    #         }
-    #         else {
-    #             Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue $false
-    #         }
-    #     }
-    # }
+            # }
+            # if ( $Trustee -and ((($TrusteeObj.DisplayName) -in $item.GrantSendOnBehalfTo)) -or (($TrusteeObj.ExternalDirectoryObjectID ) -in $item.GrantSendOnBehalfTo)) {
+            #     $Results += [PSCustomObject]@{
+            #         GUID         = $item.GUID
+            #         Identity     = $item.UserPrincipalName
+            #         Trustee      = $TrusteeObj.UserPrincipalName
+            #         TrusteeGUID  = $TrusteeObj.GUID
+            #         AccessRights = "SendOnBehalf"
+            #     }
+            # }
+            # elseif (!($Trustee) -and $item.GrantSendOnBehalfTo) {
+            #     foreach ($sobItem in ($item.GrantSendOnBehalfTo).Split(",")) {
+            #         if ( $TrusteeObj = Get-Mailbox -Identity $sobItem) {
+            #             $Results += [PSCustomObject]@{
+            #                 GUID         = $item.GUID
+            #                 Identity     = $item.UserPrincipalName
+            #                 Trustee      = $TrusteeObj.UserPrincipalName
+            #                 TrusteeGUID  = $TrusteeObj.GUID
+            #                 AccessRights = "SendOnBehalf"
+            #             }
+            #         }
+            #         else {
+            #             $Results += [PSCustomObject]@{
+            #                 GUID         = $item.GUID
+            #                 Identity     = $item.UserPrincipalName
+            #                 Trustee      = $sobItem
+            #                 TrusteeGUID  = $null
+            #                 AccessRights = "SendOnBehalf"
+            #             }
+            #         }
+            #     }
+            # }
+        }
+        # Write-Host "Completed Mailbox Permissions Check" -ForegroundColor Green
+    }
+    if ($DistGroups.Count -gt 0) {
+        # Write-Host "Checking Distribution / Mail-Enabled Security Group Membership"
+        # $i = 0
+        foreach ($item in $DistGroups) {
+            # Generate progress bar
+            # $i++
+            # $PercentComplete = ($i / $DistGroups.count) * 100
+            # Write-Progress -Id 0 -Activity "Checking Distribution / Mail-Enabled Security Group Membership" -Status "$([math]::Round($PercentComplete))% Complete" -PercentComplete $PercentComplete -CurrentOperation "Checking Distribution / Mail-Enabled Security Group: $($item.PrimarySmtpAddress)"
+            # $Members = Get-DistributionGroupMember -Identity $item.GUID -IncludeSoftDeletedObjects -ResultSize Unlimited
+            # if ($Trustee) {
+            #     foreach ($m in $Members) {
+            #         if ($m.PrimarySmtpAddress -contains $TrusteeObj.UserPrincipalName) {
+            #             $Results += [PSCustomObject]@{
+            #                 GUID         = $item.GUID
+            #                 Identity     = $item.PrimarySmtpAddress
+            #                 Trustee      = $m.PrimarySmtpAddress
+            #                 TrusteeGUID  = $m.GUID
+            #                 AccessRights = "Member"
+            #             }
+            #         }
+            #     }
+            # }
+            # else {
+            #     foreach ($m in $Members) {
+            #         $Results += [PSCustomObject]@{
+            #             GUID         = $item.GUID
+            #             Identity     = $item.PrimarySmtpAddress
+            #             Trustee      = $m.PrimarySmtpAddress
+            #             TrusteeGUID  = $m.GUID
+            #             AccessRights = "Member"
+            #         }
+            #     }
+            # }
+        }
+        Write-Host "Completed Distribution / Mail-Enabled Security Group Membership Check" -ForegroundColor Green
+    }
+    if ($RevokeTrusteeAccess -eq $true) {
+        Write-Host "Removing Mailbox Permissions & Group Membership"
+        $i = 0
+        foreach ($item in $Results) {
+            # Generate progress bar
+            $i++
+            $PercentComplete = ($i / $Results.count) * 100
+            Write-Progress -Id 0 -Activity "Removing Mailbox Permissions & Group Membership" -Status "$([math]::Round($PercentComplete))% Complete" -PercentComplete $PercentComplete -CurrentOperation "Removing Trustee Permission '$($item.AccessRights)' for '$($item.Trustee)' from '$($item.Identity)'"
+            if (-not ($null -eq $item.TrusteeGUID)) {
+                switch -Wildcard ($item.AccessRights) {
+                    "*SendOnBehalf*" {
+                        try {
+                            Set-Mailbox -Identity $item.GUID -GrantSendOnBehalfTo @{remove = "$($item.TrusteeGUID)" } -Confirm:$false -ErrorAction Stop
+                            Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue $true
+                        }
+                        catch {
+                            Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue "FAILED"
+                            Write-Warning "Unable to remove permission '$($item.AccessRights)' for '$($item.Trustee)' from '$($item.Identity)'"
+                            Write-Warning "This may need to be done manually from the on-premise Active Directory server or Exchange Online admin center"
+                        }
+                    }
+                    "*SendAs*" {
+                        try {
+                            Remove-RecipientPermission  -Identity $item.GUID -Trustee $item.TrusteeGUID -AccessRights SendAs -Confirm:$false -ErrorAction Stop
+                            Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue $true
+                        }
+                        catch {
+                            Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue "FAILED"
+                            Write-Warning "Unable to remove permission '$($item.AccessRights)' for '$($item.Trustee)' from '$($item.Identity)'"
+                            Write-Warning "This may need to be done manually from the on-premise Active Directory server or Exchange Online admin center"
+                        }
+                        break
+                    }
+                    "*Member*" {
+                        try {
+                            Remove-DistributionGroupMember -Identity $item.GUID -Member $item.TrusteeGUID -BypassSecurityGroupManagerCheck -Confirm:$false -ErrorAction Stop
+                            Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue $true
+                        }
+                        catch {
+                            Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue "FAILED"
+                            Write-Warning "Unable to remove membership for '$($item.Trustee)' from '$($item.Identity)'"
+                            Write-Warning "This may need to be done manually from the on-premise Active Directory server or Exchange Online admin center"
+                        }
+                        break
+                    }
+                    "*FullAccess*" {
+                        try {
+                            Remove-MailboxPermission -Identity $item.GUID -User $item.TrusteeGUID -AccessRights FullAccess, SendAs, ExternalAccount, DeleteItem, ReadPermission, ChangePermission, ChangeOwner -InheritanceType All -Confirm:$false -ErrorAction Stop
+                            Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue $true
+                        }
+                        catch {
+                            Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue "FAILED"
+                            Write-Warning "Unable to remove permission '$($item.AccessRights)' for '$($item.Trustee)' from '$($item.Identity)'"
+                            Write-Warning "This may need to be done manually from the on-premise Active Directory server or Exchange Online admin center"
+                        }
+                        break
+                    }
+                }
+            }
+            else {
+                Add-Member -InputObject $item -NotePropertyName PermissionsRevoked -NotePropertyValue $false
+            }
+        }
+    }
 
 }
 
