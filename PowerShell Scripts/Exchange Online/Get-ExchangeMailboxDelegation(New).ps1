@@ -196,12 +196,11 @@ process {
         $jobs = @()
         foreach ($item in $AllMailboxes) {
             $jobs += Start-ThreadJob -Name CheckMailboxPermissions -StreamingHost $Host -ScriptBlock {
-                Connect-ExchangeOnline
+                Connect-ExchangeOnline -PSSessionOption
                 $item = $using:item
                 $Trustee = $using:Trustee
                 $TrusteeObj = $using:TrusteeObj
                 $Identity = $using:Identity
-                Get-PSSession
                 if ($item.Type -eq "Mailbox") {
                     try {
                         if ($Identity -and -not $Trustee) {
