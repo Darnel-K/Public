@@ -196,7 +196,7 @@ process {
         Get-Job | Remove-Job
         $jobs = @()
         foreach ($item in ($AllMailboxes | Where-Object -Property Type -eq -Value Mailbox)) {
-            $jobs += Start-ThreadJob -Name CheckMailboxPermissions -StreamingHost $Host -ScriptBlock {
+            $jobs += Start-ThreadJob -Name CheckMailboxPermissions -ScriptBlock {
                 $item = $using:item
                 $Trustee = $using:Trustee
                 $TrusteeObj = $using:TrusteeObj
