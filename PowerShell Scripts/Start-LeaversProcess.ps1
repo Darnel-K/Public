@@ -3,7 +3,7 @@
 # Filename: \PowerShell Scripts\Start-LeaversProcess.ps1                       #
 # Repository: Public                                                           #
 # Created Date: Thursday, September 21st 2023, 11:24:20 AM                     #
-# Last Modified: Monday, September 25th 2023, 5:24:51 PM                       #
+# Last Modified: Monday, September 25th 2023, 5:27:50 PM                       #
 # Original Author: Darnel Kumar                                                #
 # Author Github: https://github.com/Darnel-K                                   #
 #                                                                              #
@@ -441,6 +441,10 @@ $host.ui.RawUI.WindowTitle = $MyInvocation.MyCommand.Name
 
 if ($Leaver -eq $false) {
     $Leaver = Read-Host "Please enter the leavers username or full email address."
+    if ($Leaver -eq "") {
+        Write-Error "Leaver cannot be blank"
+        Exit 1
+    }
 }
 Write-Host "Attempting to connect to Exchange Online."
 Connect-ExchangeOnline
