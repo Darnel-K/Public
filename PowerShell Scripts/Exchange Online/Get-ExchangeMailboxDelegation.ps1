@@ -98,9 +98,46 @@ begin {
     $Mailboxes = @()
     $Results = @()
     $DistGroups = @()
+    $PSModules = @("ExchangeOnlineManagement")
+
+    Write-Host "Checking if required modules are installed..."
+    if ((Get-PackageProvider -Name NuGet)) {
+        Write-Host "[INSTALLED] - NuGet" -ForegroundColor Green
+    }
+    else {
+        Write-Host "[ MISSING ] - NuGet" -ForegroundColor Red
+        Write-Host "[INSTALLING] - NuGet" -ForegroundColor Yellow
+        Install-PackageProvider -Name NuGet -Scope CurrentUser -Confirm:$false -Force -ForceBootstrap
+        if ((Get-PackageProvider -Name NuGet)) {
+            Write-Host "[INSTALLED] - NuGet" -ForegroundColor Green
+        }
+        else {
+            Write-Host "[ FAILED ] - NuGet" -ForegroundColor Red
+        }
+    }
+    foreach ($item in $PSModules) {
+        $Installed = Get-InstalledModule -Name $item -ErrorAction SilentlyContinue
+        if ($Installed) {
+            Write-Host "[INSTALLED] - $item" -ForegroundColor Green
+        }
+        else {
+            Write-Host "[ MISSING ] - $item" -ForegroundColor Red
+            Write-Host "[INSTALLING] - $item" -ForegroundColor Yellow
+            Install-Module -Name $item -Scope CurrentUser -Force -Confirm:$false -AllowClobber
+            if ((Get-InstalledModule -Name $item -ErrorAction SilentlyContinue)) {
+                Write-Host "[INSTALLED] - $item" -ForegroundColor Green
+            }
+            else {
+                Write-Host "[ FAILED ] - $item" -ForegroundColor Red
+                Write-Host "Please install the '$item' module using the command below."
+                Write-Host "Install-Module -Name $item -Scope CurrentUser -Force -Confirm:`$false -AllowClobber"
+            }
+        }
+    }
 
     # Get mailboxes from Exchange
     try {
+        Write-Host "Attempting to connect to Exchange Online."
         Connect-ExchangeOnline
         Write-Host "Please wait, retrieving mailboxes from server..."
         if (($Identity -and -not $Trustee) -or ($Identity -and $Trustee)) {
@@ -145,6 +182,7 @@ process {
             $i++
             $PercentComplete = ($i / $Mailboxes.count) * 100
             Write-Progress -Id 0 -Activity "Checking Mailbox Permissions" -Status "$([math]::Round($PercentComplete))% Complete" -PercentComplete $PercentComplete -CurrentOperation "Checking Mailbox: $($item.UserPrincipalName)"
+            Write-Verbose "[ Checking ] $($item.UserPrincipalName)"
             try {
                 if ($Identity -and -not $Trustee) {
                     $rp = Get-RecipientPermission -Identity $item.GUID
@@ -233,6 +271,7 @@ process {
             $i++
             $PercentComplete = ($i / $DistGroups.count) * 100
             Write-Progress -Id 0 -Activity "Checking Distribution / Mail-Enabled Security Group Membership" -Status "$([math]::Round($PercentComplete))% Complete" -PercentComplete $PercentComplete -CurrentOperation "Checking Distribution / Mail-Enabled Security Group: $($item.PrimarySmtpAddress)"
+            Write-Verbose "[ Checking ] $($item.DisplayName) ($($item.PrimarySmtpAddress))"
             $Members = Get-DistributionGroupMember -Identity $item.GUID -IncludeSoftDeletedObjects -ResultSize Unlimited
             if ($Trustee) {
                 foreach ($m in $Members) {
