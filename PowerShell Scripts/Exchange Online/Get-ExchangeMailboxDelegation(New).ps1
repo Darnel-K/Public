@@ -193,6 +193,7 @@ process {
     }
     if ($AllMailboxes.Count -gt 0) {
         Write-Host "Checking Mailbox Permissions"
+        Get-Job | Remove-Job
         $jobs = @()
         foreach ($item in $AllMailboxes) {
             $jobs += Start-ThreadJob -Name CheckMailboxPermissions -StreamingHost $Host -ScriptBlock {
@@ -314,6 +315,7 @@ process {
                 }
                 Write-Output $Results
             }
+
         }
         while (($jobs | Where-Object -Property State -ne -Value "Completed" ).Count -gt 0) {
             $PercentComplete = (($jobs | Where-Object -Property State -eq -Value "Completed" ).Count / ($jobs).Count) * 100
