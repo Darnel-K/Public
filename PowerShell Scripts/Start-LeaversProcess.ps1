@@ -3,7 +3,7 @@
 # Filename: \PowerShell Scripts\Start-LeaversProcess.ps1                       #
 # Repository: Public                                                           #
 # Created Date: Monday, September 25th 2023, 4:40:12 PM                        #
-# Last Modified: Tuesday, September 26th 2023, 5:12:40 PM                      #
+# Last Modified: Tuesday, September 26th 2023, 5:23:36 PM                      #
 # Original Author: Darnel Kumar                                                #
 # Author Github: https://github.com/Darnel-K                                   #
 #                                                                              #
@@ -459,6 +459,7 @@ Write-Host "Completed removal of exchange mailbox delegation" -ForegroundColor G
 Write-Host "Converting $($User.UserPrincipalName) to a shared mailbox"
 try {
     Set-Mailbox -Identity $User.GUID -Type Shared
+    Write-Host "Converted $($User.UserPrincipalName) to a shared mailbox"
 }
 catch {
     Write-Warning $Error[0]
