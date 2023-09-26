@@ -2,8 +2,8 @@
 # ############################################################################ #
 # Filename: \PowerShell Scripts\Start-LeaversProcess.ps1                       #
 # Repository: Public                                                           #
-# Created Date: Thursday, September 21st 2023, 11:24:20 AM                     #
-# Last Modified: Monday, September 25th 2023, 5:27:50 PM                       #
+# Created Date: Monday, September 25th 2023, 4:40:12 PM                        #
+# Last Modified: Tuesday, September 26th 2023, 5:12:40 PM                      #
 # Original Author: Darnel Kumar                                                #
 # Author Github: https://github.com/Darnel-K                                   #
 #                                                                              #
@@ -40,7 +40,7 @@
 Param (
     [Parameter()]
     [string]
-    $Leaver = $false
+    $Leaver = ""
 )
 
 function Get-ExchangeMailboxDelegation() {
@@ -401,7 +401,7 @@ function Get-ExchangeMailboxDelegation() {
     }
 
     end {
-        Disconnect-ExchangeOnline -Confirm:$false
+        # Disconnect-ExchangeOnline -Confirm:$false
         #Export the Data to CSV file
         if ($OutputPath) {
             if ( Test-Path $OutputPath ) {
@@ -439,7 +439,7 @@ function Get-ExchangeMailboxDelegation() {
 $ProgressPreference = "Continue"
 $host.ui.RawUI.WindowTitle = $MyInvocation.MyCommand.Name
 
-if ($Leaver -eq $false) {
+if ($Leaver -eq "") {
     $Leaver = Read-Host "Please enter the leavers username or full email address."
     if ($Leaver -eq "") {
         Write-Error "Leaver cannot be blank"
@@ -448,25 +448,26 @@ if ($Leaver -eq $false) {
 }
 Write-Host "Attempting to connect to Exchange Online."
 Connect-ExchangeOnline
-$Leaver = Get-Mailbox -Identity $Leaver
+$User = Get-Mailbox -Identity $Leaver
 # }
 
 # process {
 Write-Host "Starting removal of exchange mailbox delegation"
-$exo_delegation = Get-ExchangeMailboxDelegation -Trustee $Leaver.GUID -RevokeTrusteeAccess
-Write-Host "Removal of exchange mailbox delegation complete"
-Write-Host $exo_delegation
-Write-Host "Converting $($Leaver.UserPrincipalName) to a shared mailbox"
+$exo_delegation = Get-ExchangeMailboxDelegation -Trustee $User.GUID -RevokeTrusteeAccess
+Write-Host "Completed removal of exchange mailbox delegation" -ForegroundColor Green
+# Write-Host $exo_delegation
+Write-Host "Converting $($User.UserPrincipalName) to a shared mailbox"
 try {
-    Set-Mailbox -Identity $Leaver.GUID -Type Shared
+    Set-Mailbox -Identity $User.GUID -Type Shared
 }
 catch {
-    Write-Error "Error converting to shared mailbox"
-    Write-Error "Please use adming.exchange.microsoft.com to convert $($Leaver.UserPrincipalName) to a shared mailbox"
-    Write-Error $Error[0]
+    Write-Warning $Error[0]
+    Write-Warning "Error converting to shared mailbox"
+    Write-Warning "Please use adming.exchange.microsoft.com to convert $($User.UserPrincipalName) to a shared mailbox"
 }
 # }
 
 # end {
+Disconnect-ExchangeOnline -Confirm:$false
 Write-Output $exo_delegation
 # }
