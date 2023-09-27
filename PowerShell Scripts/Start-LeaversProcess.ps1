@@ -3,7 +3,7 @@
 # Filename: \PowerShell Scripts\Start-LeaversProcess.ps1                       #
 # Repository: Public                                                           #
 # Created Date: Monday, September 25th 2023, 4:40:12 PM                        #
-# Last Modified: Tuesday, September 26th 2023, 5:23:51 PM                      #
+# Last Modified: Wednesday, September 27th 2023, 1:11:37 PM                    #
 # Original Author: Darnel Kumar                                                #
 # Author Github: https://github.com/Darnel-K                                   #
 #                                                                              #
@@ -131,42 +131,6 @@ function Get-ExchangeMailboxDelegation() {
         $Mailboxes = @()
         $Results = @()
         $DistGroups = @()
-        $PSModules = @("ExchangeOnlineManagement")
-
-        Write-Host "Checking if required modules are installed..."
-        if ((Get-PackageProvider -Name NuGet)) {
-            Write-Host "[INSTALLED] - NuGet" -ForegroundColor Green
-        }
-        else {
-            Write-Host "[ MISSING ] - NuGet" -ForegroundColor Red
-            Write-Host "[INSTALLING] - NuGet" -ForegroundColor Yellow
-            Install-PackageProvider -Name NuGet -Scope CurrentUser -Confirm:$false -Force -ForceBootstrap
-            if ((Get-PackageProvider -Name NuGet)) {
-                Write-Host "[INSTALLED] - NuGet" -ForegroundColor Green
-            }
-            else {
-                Write-Host "[ FAILED ] - NuGet" -ForegroundColor Red
-            }
-        }
-        foreach ($item in $PSModules) {
-            $Installed = Get-InstalledModule -Name $item -ErrorAction SilentlyContinue
-            if ($Installed) {
-                Write-Host "[INSTALLED] - $item" -ForegroundColor Green
-            }
-            else {
-                Write-Host "[ MISSING ] - $item" -ForegroundColor Red
-                Write-Host "[INSTALLING] - $item" -ForegroundColor Yellow
-                Install-Module -Name $item -Scope CurrentUser -Force -Confirm:$false -AllowClobber
-                if ((Get-InstalledModule -Name $item -ErrorAction SilentlyContinue)) {
-                    Write-Host "[INSTALLED] - $item" -ForegroundColor Green
-                }
-                else {
-                    Write-Host "[ FAILED ] - $item" -ForegroundColor Red
-                    Write-Host "Please install the '$item' module using the command below."
-                    Write-Host "Install-Module -Name $item -Scope CurrentUser -Force -Confirm:`$false -AllowClobber"
-                }
-            }
-        }
 
         # Get mailboxes from Exchange
         try {
@@ -444,6 +408,42 @@ if ($Leaver -eq "") {
     if ($Leaver -eq "") {
         Write-Error "Leaver cannot be blank"
         Exit 1
+    }
+}
+$PSModules = @("ExchangeOnlineManagement")
+
+Write-Host "Checking if required modules are installed..."
+if ((Get-PackageProvider -Name NuGet)) {
+    Write-Host "[INSTALLED] - NuGet" -ForegroundColor Green
+}
+else {
+    Write-Host "[ MISSING ] - NuGet" -ForegroundColor Red
+    Write-Host "[INSTALLING] - NuGet" -ForegroundColor Yellow
+    Install-PackageProvider -Name NuGet -Scope CurrentUser -Confirm:$false -Force -ForceBootstrap
+    if ((Get-PackageProvider -Name NuGet)) {
+        Write-Host "[INSTALLED] - NuGet" -ForegroundColor Green
+    }
+    else {
+        Write-Host "[ FAILED ] - NuGet" -ForegroundColor Red
+    }
+}
+foreach ($item in $PSModules) {
+    $Installed = Get-InstalledModule -Name $item -ErrorAction SilentlyContinue
+    if ($Installed) {
+        Write-Host "[INSTALLED] - $item" -ForegroundColor Green
+    }
+    else {
+        Write-Host "[ MISSING ] - $item" -ForegroundColor Red
+        Write-Host "[INSTALLING] - $item" -ForegroundColor Yellow
+        Install-Module -Name $item -Scope CurrentUser -Force -Confirm:$false -AllowClobber
+        if ((Get-InstalledModule -Name $item -ErrorAction SilentlyContinue)) {
+            Write-Host "[INSTALLED] - $item" -ForegroundColor Green
+        }
+        else {
+            Write-Host "[ FAILED ] - $item" -ForegroundColor Red
+            Write-Host "Please install the '$item' module using the command below."
+            Write-Host "Install-Module -Name $item -Scope CurrentUser -Force -Confirm:`$false -AllowClobber"
+        }
     }
 }
 Write-Host "Attempting to connect to Exchange Online."
