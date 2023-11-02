@@ -3,7 +3,7 @@
 # Filename: \Intune\PowerShell Scripts\Invoke-DeployWallpaper.ps1              #
 # Repository: Public                                                           #
 # Created Date: Wednesday, June 14th 2023, 9:52:14 AM                          #
-# Last Modified: Thursday, November 2nd 2023, 10:20:21 AM                      #
+# Last Modified: Thursday, November 2nd 2023, 10:57:32 AM                      #
 # Original Author: Darnel Kumar                                                #
 # Author Github: https://github.com/Darnel-K                                   #
 #                                                                              #
@@ -12,24 +12,44 @@
 #>
 
 $b64 = ""
-$LockScreenWallpaperFile = 'C:\Windows\Web\DeployedWallpaper.jpg'
-$DesktopWallpaperFile = '%USERPROFILE%\Local Settings\Application Data\Sysinternals\BGInfo\ModifiedWallpaper.bmp'
+$Filename = ""
+$LockScreenWallpaperPath = ''
+$DesktopWallpaperPath = ''
 $RegKeyPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\PersonalizationCSP"
 $StatusValue = "1"
 
-if ( !(Test-Path -Path $LockScreenWallpaperFile) ) {
-    $bytes = [Convert]::FromBase64String($b64)
-    [IO.File]::WriteAllBytes($LockScreenWallpaperFile, $bytes)
-    if ( Test-Path -Path $LockScreenWallpaperFile) {
-        Write-Output "File created successfully"
-    }
-    else {
-        Write-Output "Failed to create file"
-        Exit 1
-    }
+if ( !(Test-Path -Path $LockScreenWallpaperPath) ) {
+    New-Item -ItemType Directory -Path $LockScreenWallpaperPath
+}
+if ( !(Test-Path -Path $DesktopWallpaperPath)) {
+    New-Item -ItemType Directory -Path $DesktopWallpaperPath
+}
+
+if (Test-Path -Path "$LockScreenWallpaperPath\$Filename") {
+    Remove-Item -Path "$LockScreenWallpaperPath\$Filename"
+}
+if (Test-Path -Path "$DesktopWallpaperPath\$Filename") {
+    Remove-Item -Path "$DesktopWallpaperPath\$Filename"
+}
+
+$bytes = [Convert]::FromBase64String($b64)
+[IO.File]::WriteAllBytes("$LockScreenWallpaperPath\$Filename", $bytes)
+if (Test-Path -Path "$LockScreenWallpaperPath\$Filename") {
+    Write-Host "File created successfully"
 }
 else {
-    Write-Output "File already exists"
+    Write-Host "Failed to create file"
+    Exit 1
+}
+
+$bytes = [Convert]::FromBase64String($b64)
+[IO.File]::WriteAllBytes("$DesktopWallpaperPath\$Filename", $bytes)
+if (Test-Path -Path "$DesktopWallpaperPath\$Filename") {
+    Write-Host "File created successfully"
+}
+else {
+    Write-Host "Failed to create file"
+    Exit 1
 }
 
 $RegData = @(
@@ -51,18 +71,18 @@ $RegData = @(
         Value = $DesktopWallpaperFile
         Type  = "STRING"
     }
-    [PSCustomObject]@{
-        Path  = $RegKeyPath
-        Name  = "LockScreenImagePath"
-        Value = $LockScreenWallpaperFile
-        Type  = "STRING"
-    }
-    [PSCustomObject]@{
-        Path  = $RegKeyPath
-        Name  = "LockScreenImageStatus"
-        Value = $StatusValue
-        Type  = "DWORD"
-    }
+    # [PSCustomObject]@{
+    #     Path  = $RegKeyPath
+    #     Name  = "LockScreenImagePath"
+    #     Value = $LockScreenWallpaperFile
+    #     Type  = "STRING"
+    # }
+    # [PSCustomObject]@{
+    #     Path  = $RegKeyPath
+    #     Name  = "LockScreenImageStatus"
+    #     Value = $StatusValue
+    #     Type  = "DWORD"
+    # }
 )
 
 foreach ($i in $RegData) {
