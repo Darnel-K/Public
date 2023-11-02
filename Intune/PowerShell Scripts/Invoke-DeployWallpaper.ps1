@@ -3,7 +3,7 @@
 # Filename: \Intune\PowerShell Scripts\Invoke-DeployWallpaper.ps1              #
 # Repository: Public                                                           #
 # Created Date: Wednesday, June 14th 2023, 9:52:14 AM                          #
-# Last Modified: Thursday, November 2nd 2023, 11:05:24 AM                      #
+# Last Modified: Thursday, November 2nd 2023, 11:09:01 AM                      #
 # Original Author: Darnel Kumar                                                #
 # Author Github: https://github.com/Darnel-K                                   #
 #                                                                              #
