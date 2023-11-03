@@ -3,13 +3,25 @@
 # Filename: \Intune\PowerShell Scripts\Invoke-DeployWallpaper.ps1              #
 # Repository: Public                                                           #
 # Created Date: Wednesday, June 14th 2023, 9:52:14 AM                          #
-# Last Modified: Thursday, November 2nd 2023, 11:09:01 AM                      #
+# Last Modified: Friday, November 3rd 2023, 1:53:43 PM                         #
 # Original Author: Darnel Kumar                                                #
 # Author Github: https://github.com/Darnel-K                                   #
 #                                                                              #
 # Copyright (c) 2023 Darnel Kumar                                              #
 # ############################################################################ #
 #>
+
+If ($ENV:PROCESSOR_ARCHITEW6432 -eq "AMD64") {
+    Try {
+        Write-Host "Starting in 64 bit mode"
+        &"$ENV:WINDIR\SysNative\WindowsPowershell\v1.0\PowerShell.exe" -File $PSCOMMANDPATH
+    }
+    Catch {
+        Throw "Failed to start $PSCOMMANDPATH"
+        Exit 1
+    }
+    Exit 1
+}
 
 $b64 = ""
 $LockScreenWallpaperFile = ''
