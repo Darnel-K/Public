@@ -1,14 +1,14 @@
 <#
- * ############################################################################
- * Filename: \Intune\PowerShell Scripts\Disable-IPv6.ps1
- * Repository: Public
- * Created Date: Monday, August 14th 2023, 12:26:40 PM
- * Last Modified: Monday, August 14th 2023, 2:13:42 PM
- * Original Author: Darnel Kumar
- * Author Github: https://github.com/Darnel-K
- *
- * Copyright (c) 2023 Darnel Kumar
- * ############################################################################
+# ############################################################################ #
+# Filename: \Intune\PowerShell Scripts\Disable-IPv6.ps1                        #
+# Repository: Public                                                           #
+# Created Date: Friday, June 2nd 2023, 5:22:51 PM                              #
+# Last Modified: Thursday, November 23rd 2023, 4:20:32 PM                      #
+# Original Author: Darnel Kumar                                                #
+# Author Github: https://github.com/Darnel-K                                   #
+#                                                                              #
+# Copyright (c) 2023 Darnel Kumar                                              #
+# ############################################################################ #
 #>
 
 <#
@@ -23,7 +23,7 @@ begin {
     $ProgressPreference = "Continue"
     $host.ui.RawUI.WindowTitle = $MyInvocation.MyCommand.Name
     # Update LogName and LogSource
-    $LogName = "ABYSS.ORG.UK"; $LogSource = ".Intune.PSScript.DisableIPv6";
+    $LogName = "ABYSS.ORG.UK"; $LogSource = ".Intune.PSScript.Disable-IPv6";
     if (-not ([System.Diagnostics.EventLog]::Exists($LogName)) -or -not ([System.Diagnostics.EventLog]::SourceExists($LogSource))) {
         try {
             New-EventLog -LogName $LogName -Source $LogSource
@@ -36,17 +36,34 @@ begin {
             Write-EventLog -LogName $LogName -Source $LogSource -EntryType Warning -Message $Error[0] -EventId 0
         }
     }
+    $networkAdapters = @()
+    $Errors = 0
 }
 
 process {
-    try {
-        Disable-NetAdapterBinding -Name "*" -ComponentID ms_tcpip6
+    $networkAdapters += Get-NetAdapterBinding | Where-Object -Property ComponentID -Like "*tcpip6*" | Where-Object -Property Enabled -EQ $true
+    foreach ($item in $networkAdapters) {
+        try {
+            Disable-NetAdapterBinding -InputObject $item
+            Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Disabled '$($item.DisplayName)' on '$($item.Name)'." -EventId 0
+        }
+        catch {
+            Write-EventLog -LogName $LogName -Source $LogSource -EntryType Error -Message "Unable to disable '$($item.DisplayName)' on '$($item.Name)'." -EventId 0
+            Write-EventLog -LogName $LogName -Source $LogSource -EntryType Error -Message $Error[0] -EventId 0
+            $Errors++
+        }
+    }
+}
+
+end {
+    $failedAdapters = @()
+    $failedAdapters += Get-NetAdapterBinding | Where-Object -Property ComponentID -Like "*tcpip6*" | Where-Object -Property Enabled -EQ $true
+    if (($failedAdapters.Count -eq 0) -and ($Errors -eq 0)) {
         Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Disabled IPv6 on all network devices." -EventId 0
         Exit 0
     }
-    catch {
-        Write-EventLog -LogName $LogName -Source $LogSource -EntryType Error -Message "Unable to disable IPv6" -EventId 0
-        Write-EventLog -LogName $LogName -Source $LogSource -EntryType Error -Message $Error[0] -EventId 0
+    else {
+        Write-EventLog -LogName $LogName -Source $LogSource -EntryType Error -Message "Unable to disable IPv6 on all devices. Check Event Log for more info." -EventId 0
         Exit 1
     }
 }
