@@ -2,8 +2,8 @@
 # ############################################################################ #
 # Filename: \Intune\PowerShell Scripts\Set-WallpaperStyle.ps1                  #
 # Repository: Public                                                           #
-# Created Date: Friday, June 2nd 2023, 5:22:51 PM                              #
-# Last Modified: Thursday, November 23rd 2023, 4:28:44 PM                      #
+# Created Date: Wednesday, June 14th 2023, 9:52:14 AM                          #
+# Last Modified: Friday, November 24th 2023, 11:33:06 AM                       #
 # Original Author: Darnel Kumar                                                #
 # Author Github: https://github.com/Darnel-K                                   #
 #                                                                              #
@@ -52,34 +52,38 @@ process {
         if (!(Test-Path -Path $i.Path)) {
             try {
                 New-Item -Path $i.Path -Force
+                Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Created path: $($i.Path)" -EventId 0
             }
             catch {
-                Write-Warning "Failed to create registry path: $($i.Path)"
-                Write-Verbose $Error[0]
+                Write-EventLog -LogName $LogName -Source $LogSource -EntryType Error -Message "Failed to create registry path: $($i.Path)" -EventId 0
+                Write-EventLog -LogName $LogName -Source $LogSource -EntryType Error -Message $Error[0] -EventId 0
                 Exit 1
             }
         }
         if ((Get-ItemProperty $i.Path).PSObject.Properties.Name -contains $i.Name) {
             try {
                 Set-ItemProperty -Path $i.Path -Name $i.Name -Value $i.Value
+                Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message (@('Successfully made the following registry edit:', "Key: $($i.Path)", "Property: $($i.Name)", "Value: $($i.Value)", "Type: $($i.Type)") | Out-String) -EventId 0
             }
             catch {
-                Write-Warning @('Failed to make the following registry edit.', "Key: $($i.Path)", "Property: $($i.Name)", "Value: $($i.Value)", "Type: $($i.Type)")
-                Write-Verbose $Error[0]
+                Write-EventLog -LogName $LogName -Source $LogSource -EntryType Error -Message @('Failed to make the following registry edit:', "Key: $($i.Path)", "Property: $($i.Name)", "Value: $($i.Value)", "Type: $($i.Type)") -EventId 0
+                Write-EventLog -LogName $LogName -Source $LogSource -EntryType Error -Message $Error[0] -EventId 0
                 Exit 1
             }
         }
         else {
             try {
                 New-ItemProperty -Path $i.Path -Name $i.Name -Value $i.Value -Type $i.Type
+                Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message (@('Created the following registry entry:', "Key: $($i.Path)", "Property: $($i.Name)", "Value: $($i.Value)", "Type: $($i.Type)") | Out-String) -EventId 0
             }
             catch {
-                Write-Warning @('Failed to make the following registry edit.', "Key: $($i.Path)", "Property: $($i.Name)", "Value: $($i.Value)", "Type: $($i.Type)")
-                Write-Verbose $Error[0]
+                Write-EventLog -LogName $LogName -Source $LogSource -EntryType Error -Message @('Failed to make the following registry edit:', "Key: $($i.Path)", "Property: $($i.Name)", "Value: $($i.Value)", "Type: $($i.Type)") -EventId 0
+                Write-EventLog -LogName $LogName -Source $LogSource -EntryType Error -Message $Error[0] -EventId 0
                 Exit 1
             }
         }
     }
+    Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Completed registry update successfully." -EventId 0
     RUNDLL32.EXE USER32.DLL, UpdatePerUserSystemParameters 1, True
     Exit 0
 }
