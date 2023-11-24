@@ -2,8 +2,8 @@
 # ############################################################################ #
 # Filename: \Intune\PowerShell Scripts\Set-UserLocale(UK).ps1                  #
 # Repository: Public                                                           #
-# Created Date: Thursday, April 13th 2023, 11:41:25 AM                         #
-# Last Modified: Friday, November 24th 2023, 3:27:45 PM                        #
+# Created Date: Friday, November 24th 2023, 10:02:01 PM                        #
+# Last Modified: Friday, November 24th 2023, 10:03:35 PM                       #
 # Original Author: Darnel Kumar                                                #
 # Author Github: https://github.com/Darnel-K                                   #
 #                                                                              #
