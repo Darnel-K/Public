@@ -3,7 +3,7 @@
 # Filename: \Intune\PowerShell Scripts\Remove-WindowsPhotoViewer.ps1           #
 # Repository: Public                                                           #
 # Created Date: Friday, November 24th 2023, 11:42:03 AM                        #
-# Last Modified: Friday, November 24th 2023, 11:55:22 AM                       #
+# Last Modified: Friday, November 24th 2023, 2:43:02 PM                        #
 # Original Author: Darnel Kumar                                                #
 # Author Github: https://github.com/Darnel-K                                   #
 #                                                                              #
@@ -13,17 +13,17 @@
 
 <#
 .SYNOPSIS
-    Re-enables Windows Photo Viewer
+    Removes Windows Photo Viewer
 .DESCRIPTION
-    Re-enables Windows Photo Viewer on the executing device by setting the file associations
+    Removes Windows Photo Viewer on the executing device by setting the file associations
 .EXAMPLE
-    & .\Enable-WindowsPhotoViewer.ps1
+    & .\Remove-WindowsPhotoViewer.ps1
 #>
 begin {
     $ProgressPreference = "Continue"
     $host.ui.RawUI.WindowTitle = $MyInvocation.MyCommand.Name
     # Update LogName and LogSource
-    $LogName = "ABYSS.ORG.UK"; $LogSource = ".Intune.PSScript.Enable-WindowsPhotoViewer";
+    $LogName = "ABYSS.ORG.UK"; $LogSource = ".Intune.PSScript.Remove-WindowsPhotoViewer";
     if (-not ([System.Diagnostics.EventLog]::Exists($LogName)) -or -not ([System.Diagnostics.EventLog]::SourceExists($LogSource))) {
         try {
             New-EventLog -LogName $LogName -Source $LogSource
