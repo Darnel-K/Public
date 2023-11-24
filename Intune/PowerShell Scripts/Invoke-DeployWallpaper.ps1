@@ -2,8 +2,8 @@
 # ############################################################################ #
 # Filename: \Intune\PowerShell Scripts\Invoke-DeployWallpaper.ps1              #
 # Repository: Public                                                           #
-# Created Date: Friday, June 2nd 2023, 5:22:51 PM                              #
-# Last Modified: Thursday, November 23rd 2023, 4:32:47 PM                      #
+# Created Date: Wednesday, June 14th 2023, 9:52:14 AM                          #
+# Last Modified: Friday, November 24th 2023, 10:53:48 AM                       #
 # Original Author: Darnel Kumar                                                #
 # Author Github: https://github.com/Darnel-K                                   #
 #                                                                              #
@@ -50,9 +50,8 @@ begin {
     $b64 = ""
     $LockScreenWallpaperFile = ''
     $DesktopWallpaperFile = ''
-    $RegKeyPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\PersonalizationCSP"
-    $StatusValue = "1"
-    $RegData = @()
+
+    $RegKeyPath, $StatusValue, $RegData = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\PersonalizationCSP", "1", @()
 
     if (!($LockScreenWallpaperFile -eq "")) {
         if ( !(Test-Path -Path $LockScreenWallpaperFile) ) {
