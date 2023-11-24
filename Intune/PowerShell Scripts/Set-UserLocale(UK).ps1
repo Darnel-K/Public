@@ -3,7 +3,7 @@
 # Filename: \Intune\PowerShell Scripts\Set-UserLocale(UK).ps1                  #
 # Repository: Public                                                           #
 # Created Date: Friday, November 24th 2023, 10:02:01 PM                        #
-# Last Modified: Friday, November 24th 2023, 10:04:27 PM                       #
+# Last Modified: Friday, November 24th 2023, 10:10:11 PM                       #
 # Original Author: Darnel Kumar                                                #
 # Author Github: https://github.com/Darnel-K                                   #
 #                                                                              #
@@ -117,11 +117,6 @@ begin {
             Path  = $RegPath
             Name  = "iTLZero"
             Value = "1"
-            Type  = "STRING"
-        }, [PSCustomObject]@{
-            Path  = $RegPath
-            Name  = "sCurrency"
-            Value = "£"
             Type  = "STRING"
         }, [PSCustomObject]@{
             Path  = $RegPath
