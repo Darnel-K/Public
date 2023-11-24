@@ -1,14 +1,14 @@
 <#
- * ############################################################################
- * Filename: \Intune\PowerShell Scripts\Set-UKLocale.ps1
- * Repository: Public
- * Created Date: Monday, March 13th 2023, 5:24:01 PM
- * Last Modified: Saturday, April 15th 2023, 12:06:47 AM
- * Original Author: Darnel Kumar
- * Author Github: https://github.com/Darnel-K
- *
- * Copyright (c) 2023 Darnel Kumar
- * ############################################################################
+# ############################################################################ #
+# Filename: \Intune\PowerShell Scripts\Set-UserLocale(UK).ps1                  #
+# Repository: Public                                                           #
+# Created Date: Thursday, April 13th 2023, 11:41:25 AM                         #
+# Last Modified: Friday, November 24th 2023, 2:10:23 PM                        #
+# Original Author: Darnel Kumar                                                #
+# Author Github: https://github.com/Darnel-K                                   #
+#                                                                              #
+# Copyright (c) 2023 Darnel Kumar                                              #
+# ############################################################################ #
 #>
 
 <#
@@ -19,7 +19,7 @@
 .NOTES
     This script can be run standalone or deployed using Intune
 .EXAMPLE
-    & .\Set-UKLocale.ps1
+    & .\Set-UserLocale(UK).ps1
 #>
 
 [CmdletBinding()]
@@ -28,7 +28,7 @@ Param ()
 # Declare Variables
 $ProgressPreference = "Continue"
 $host.ui.RawUI.WindowTitle = $MyInvocation.MyCommand.Name
-$LogName = "ABYSS.ORG.UK"; $LogSource = ".Intune.PSScript.SetUKLocale";
+$LogName = "ABYSS.ORG.UK"; $LogSource = ".Intune.PSScript.Set-UserLocale(UK)";
 $DesiredLanguage = "en-GB"
 $DesiredRegion = "GB"
 
