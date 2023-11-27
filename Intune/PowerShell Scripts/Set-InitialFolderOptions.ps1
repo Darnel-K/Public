@@ -3,7 +3,7 @@
 # Filename: \Intune\PowerShell Scripts\Set-InitialFolderOptions.ps1            #
 # Repository: Public                                                           #
 # Created Date: Monday, November 27th 2023, 4:18:08 PM                         #
-# Last Modified: Monday, November 27th 2023, 5:22:41 PM                        #
+# Last Modified: Monday, November 27th 2023, 5:26:25 PM                        #
 # Original Author: Darnel Kumar                                                #
 # Author Github: https://github.com/Darnel-K                                   #
 #                                                                              #
@@ -47,22 +47,26 @@ begin {
             Name  = "Hidden"
             Value = "1"
             Type  = "DWord"
-        }, [PSCustomObject]@ {
+        }
+        [PSCustomObject]@{
             Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
             Name  = "HideDrivesWithNoMedia"
             Value = "0"
             Type  = "DWord"
-        }, [PSCustomObject]@ {
+        }
+        [PSCustomObject]@{
             Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
             Name  = "ShowEncryptCompressedColor"
             Value = "1"
             Type  = "DWord"
-        }, [PSCustomObject]@ {
+        }
+        [PSCustomObject]@{
             Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
             Name  = "HideFileExt"
             Value = "0"
             Type  = "DWord"
-        }, [PSCustomObject]@ {
+        }
+        [PSCustomObject]@{
             Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\CabinetState"
             Name  = "FullPath"
             Value = "1"
