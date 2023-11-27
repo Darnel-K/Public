@@ -2,8 +2,8 @@
 # ############################################################################ #
 # Filename: \Intune\PowerShell Scripts\Enable-VerboseStatusMessages.ps1        #
 # Repository: Public                                                           #
-# Created Date: Wednesday, June 14th 2023, 9:52:14 AM                          #
-# Last Modified: Friday, November 24th 2023, 11:33:06 AM                       #
+# Created Date: Friday, November 24th 2023, 10:02:01 PM                        #
+# Last Modified: Monday, November 27th 2023, 6:40:10 PM                        #
 # Original Author: Darnel Kumar                                                #
 # Author Github: https://github.com/Darnel-K                                   #
 #                                                                              #
@@ -24,7 +24,8 @@ begin {
     $host.ui.RawUI.WindowTitle = $MyInvocation.MyCommand.Name
     # Update LogName and LogSource
     $LogName = "ABYSS.ORG.UK"; $LogSource = ".Intune.PSScript.Enable-VerboseStatusMessages";
-    if (-not ([System.Diagnostics.EventLog]::Exists($LogName)) -or -not ([System.Diagnostics.EventLog]::SourceExists($LogSource))) {
+    $sourceExists = try { ([System.Diagnostics.EventLog]::SourceExists($LogSource)) } catch { $false }
+    if (-not ([System.Diagnostics.EventLog]::Exists($LogName)) -or -not $sourceExists ) {
         try {
             New-EventLog -LogName $LogName -Source $LogSource
             Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Initialised Event Log: $LogSource" -EventId 0
