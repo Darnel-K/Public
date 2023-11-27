@@ -3,7 +3,7 @@
 # Filename: \Intune\PowerShell Scripts\Set-UserLocale(UK).ps1                  #
 # Repository: Public                                                           #
 # Created Date: Friday, November 24th 2023, 10:02:01 PM                        #
-# Last Modified: Friday, November 24th 2023, 10:10:11 PM                       #
+# Last Modified: Monday, November 27th 2023, 6:40:10 PM                        #
 # Original Author: Darnel Kumar                                                #
 # Author Github: https://github.com/Darnel-K                                   #
 #                                                                              #
@@ -26,8 +26,9 @@ begin {
     $ProgressPreference = "Continue"
     $host.ui.RawUI.WindowTitle = $MyInvocation.MyCommand.Name
     # Update LogName and LogSource
-    $LogName = "ABYSS.ORG.UK"; $LogSource = ".Intune.PSScript.Set-Locale(UK)";
-    if (-not ([System.Diagnostics.EventLog]::Exists($LogName)) -or -not ([System.Diagnostics.EventLog]::SourceExists($LogSource))) {
+    $LogName = "ABYSS.ORG.UK"; $LogSource = ".Intune.PSScript.Set-UserLocale(UK)";
+    $sourceExists = try { ([System.Diagnostics.EventLog]::SourceExists($LogSource)) } catch { $false }
+    if (-not ([System.Diagnostics.EventLog]::Exists($LogName)) -or -not $sourceExists ) {
         try {
             New-EventLog -LogName $LogName -Source $LogSource
             Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Initialised Event Log: $LogSource" -EventId 0
