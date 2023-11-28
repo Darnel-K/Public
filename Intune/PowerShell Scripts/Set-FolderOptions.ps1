@@ -2,8 +2,8 @@
 # ############################################################################ #
 # Filename: \Intune\PowerShell Scripts\Set-FolderOptions.ps1                   #
 # Repository: Public                                                           #
-# Created Date: Friday, November 24th 2023, 10:02:01 PM                        #
-# Last Modified: Monday, November 27th 2023, 6:40:10 PM                        #
+# Created Date: Monday, November 27th 2023, 4:18:08 PM                         #
+# Last Modified: Tuesday, November 28th 2023, 1:13:45 PM                       #
 # Original Author: Darnel Kumar                                                #
 # Author Github: https://github.com/Darnel-K                                   #
 #                                                                              #
@@ -28,7 +28,7 @@ begin {
     $ProgressPreference = "Continue"
     $host.ui.RawUI.WindowTitle = $MyInvocation.MyCommand.Name
     # Update LogName and LogSource
-    $LogName = "ABYSS.ORG.UK"; $LogSource = ".Intune.PSScript.Set-InitialFolderOptions";
+    $LogName = "ABYSS.ORG.UK"; $LogSource = ".Intune.PSScript.Set-FolderOptions";
     $sourceExists = try { ([System.Diagnostics.EventLog]::SourceExists($LogSource)) } catch { $false }
     if (-not ([System.Diagnostics.EventLog]::Exists($LogName)) -or -not $sourceExists ) {
         try {
