@@ -48,7 +48,7 @@ begin {
 process {
     try {
         Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Starting Bitwarden installation" -EventId 0
-        Start-Process -FilePath ".\Bitwarden-Installer-2023.2.0.exe" -Wait -WindowStyle Hidden -ArgumentList "/S /ALLUSERS" -Verb RunAs
+        Start-Process -FilePath ".\Bitwarden-Installer-2023.12.1.exe" -Wait -WindowStyle Hidden -ArgumentList "/S /ALLUSERS" -Verb RunAs
         if (Test-Path "$env:ProgramFiles\Bitwarden\Bitwarden.exe" -PathType Leaf) {
             Write-EventLog -LogName $LogName -Source $LogSource -EntryType Information -Message "Bitwarden installation complete" -EventId 0
             Exit 0
