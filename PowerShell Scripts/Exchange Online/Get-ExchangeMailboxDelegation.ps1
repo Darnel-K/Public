@@ -89,7 +89,11 @@ Param (
     [Parameter()]
     [switch]
     # Revokes all access for the Trustee
-    $RevokeTrusteeAccess = $false
+    $RevokeTrusteeAccess = $false,
+    [Parameter()]
+    [switch]
+    # Stops the script auto connecting to Exchange Online
+    $DisableExchangeAutoConnect = $false
 )
 
 begin {
@@ -137,8 +141,10 @@ begin {
 
     # Get mailboxes from Exchange
     try {
-        Write-Host "Attempting to connect to Exchange Online."
-        Connect-ExchangeOnline
+        if ($DisableExchangeAutoConnect -eq $false) {
+            Write-Host "Attempting to connect to Exchange Online."
+            Connect-ExchangeOnline
+        }
         Write-Host "Please wait, retrieving mailboxes from server..."
         if (($Identity -and -not $Trustee) -or ($Identity -and $Trustee)) {
             if (-not ($Mailboxes += Get-Mailbox -ResultSize Unlimited -Identity $Identity -ErrorAction SilentlyContinue)) {
@@ -368,7 +374,9 @@ process {
 }
 
 end {
-    Disconnect-ExchangeOnline -Confirm:$false
+    if ($DisableExchangeAutoConnect -eq $false) {
+        Disconnect-ExchangeOnline -Confirm:$false
+    }
     #Export the Data to CSV file
     if ($OutputPath) {
         if ( Test-Path $OutputPath ) {
