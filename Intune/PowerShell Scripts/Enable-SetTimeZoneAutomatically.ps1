@@ -1,9 +1,9 @@
 <#
 # ############################################################################
-# Filename: \Intune\PowerShell Scripts\Enable-SetTimezoneAutomatically.ps1
+# Filename: \Intune\PowerShell Scripts\Enable-SetTimeZoneAutomatically.ps1
 # Repository: Public
-# Created Date: Thursday, June 20th 2024, 2:37:40 PM
-# Last Modified: Thursday, June 20th 2024, 2:44:49 PM
+# Created Date: Sunday, June 23rd 2024, 11:01:13 PM
+# Last Modified: Tuesday, June 25th 2024, 10:47:45 AM
 # Original Author: Darnel Kumar
 # Author Github: https://github.com/Darnel-K
 # Github Org: https://github.com/ABYSS-ORG-UK/
@@ -45,12 +45,6 @@ begin {
             Name  = "Start"
             Value = "3"
             Type  = "DWord"
-        }
-        [PSCustomObject]@{
-            Path  = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location"
-            Name  = "Value"
-            Value = "Allow"
-            Type  = "String"
         }
     )
 }
