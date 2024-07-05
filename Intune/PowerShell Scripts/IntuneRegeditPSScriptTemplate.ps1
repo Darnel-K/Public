@@ -27,11 +27,27 @@
 
 <#
 .SYNOPSIS
-    Disables Verbose Status Messages
+    A brief description of the function or script. This keyword can be used only once in each topic.
 .DESCRIPTION
-    Disables Verbose Status Messages on the executing device
+    A detailed description of the function or script. This keyword can be used only once in each topic.
+.PARAMETER Param1
+    The description of a parameter. You can include a .PARAMETER keyword for each parameter in the function or script.
+
+    The .PARAMETER keywords can appear in any order in the comment block, but the order in which the parameters appear in the Param statement or function declaration determines the order in which the parameters appear in Help topic. To change the order of parameters in the Help topic, change the order of the parameters in the Param statement or function declaration.
+
+    You can also specify a parameter description by placing a comment in the Param statement immediately before the parameter variable name. If you use both a Param statement comment and a .PARAMETER keyword, the description associated with the .PARAMETER keyword is used, and the Param statement comment is ignored.
+.INPUTS
+    The Microsoft .NET Framework types of objects that can be piped to the function or script. You can also include a description of the input objects.
+.OUTPUTS
+    The .NET Framework type of the objects that the cmdlet returns. You can also include a description of the returned objects.
+.NOTES
+    Additional information about the function or script.
+.LINK
+    The name of a related topic. Repeat this keyword for each related topic. This content appears in the Related Links section of the Help topic.
+
+    The .LINK keyword content can also include a Uniform Resource Identifier (URI) to an online version of the same Help topic. The online version opens when you use the Online parameter of Get-Help. The URI must begin with "http" or "https".
 .EXAMPLE
-    & .\Disable-VerboseStatusMessages.ps1
+    A sample command that uses the function or script, optionally followed by sample output and a description. Repeat this keyword for each example.
 #>
 
 [CmdletBinding()]
@@ -42,20 +58,14 @@
 #                               #
 #################################
 
-$SCRIPT_NAME = "Disable-VerboseStatusMessages"
+$SCRIPT_NAME = ""
 $REG_DATA = @(
     [PSCustomObject]@{
-            Path  = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
-            Name  = "verbosestatus"
-            Value = "0"
-            Type  = "DWord"
-        }
-        [PSCustomObject]@{
-            Path  = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
-            Name  = "DisableStatusMessages"
-            Value = "1"
-            Type  = "DWord"
-        }
+        Path  = "" # Registry key path
+        Name  = "" # Registry property name
+        Value = "" # Registry property value
+        Type  = "" # Binary, DWord, ExpandString, MultiString, String or QWord
+    }
 )
 
 ################################################
