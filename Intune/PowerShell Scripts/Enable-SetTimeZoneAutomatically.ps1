@@ -2,8 +2,8 @@
 # #################################################################################################################### #
 # Filename: \Intune\PowerShell Scripts\Enable-SetTimeZoneAutomatically.ps1                                             #
 # Repository: Public                                                                                                   #
-# Created Date: Sunday, June 23rd 2024, 11:01:13 PM                                                                    #
-# Last Modified: Friday, July 5th 2024, 10:11:46 PM                                                                    #
+# Created Date: Saturday, July 6th 2024, 12:48:11 AM                                                                   #
+# Last Modified: Saturday, July 6th 2024, 1:05:57 AM                                                                   #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 # Github Org: https://github.com/ABYSS-ORG-UK/                                                                         #
@@ -43,6 +43,7 @@
 #################################
 
 $SCRIPT_NAME = "Enable-SetTimeZoneAutomatically"
+$SCRIPT_EXEC_MODE = "Update" # Update or Delete. Tells the script to either update the registry or delete the keys
 $REG_DATA = @(
     [PSCustomObject]@{
         Path  = "HKLM:\SYSTEM\CurrentControlSet\Services\tzautoupdate"
@@ -100,8 +101,43 @@ function updateRegistry {
     Exit 0
 }
 
+function removeRegistry {
+    foreach ($i in $REG_DATA) {
+        if (Test-Path -Path $i.Path) {
+            if ($i.Name) {
+                try {
+                    Remove-ItemProperty -Path $i.Path -Name $i.Name
+                    $CUSTOM_LOG.Success("Removed registry Property:`n - Key: $($i.Path)`n - Property: $($i.Name)")
+                }
+                catch {
+                    $CUSTOM_LOG.Fail("Failed to remove registy property: $($i.Name) at path: $($i.Path)")
+                    $CUSTOM_LOG.Error($Error[0])
+                    Exit 1
+                }
+            }
+            else {
+                try {
+                    Remove-Item -Path $i.Path -Recurse -Force
+                    $CUSTOM_LOG.Success("Removed registry Key:`n - Key: $($i.Path)")
+                }
+                catch {
+                    $CUSTOM_LOG.Fail("Failed to remove registy path: $($i.Path)")
+                    $CUSTOM_LOG.Error($Error[0])
+                    Exit 1
+                }
+            }
+        }
+    }
+    $CUSTOM_LOG.Success("Completed registry update successfully.")
+    Exit 0
+}
+
 function init {
-    updateRegistry
+    switch ($SCRIPT_EXEC_MODE) {
+        "Update" { updateRegistry }
+        "Delete" { removeRegistry }
+        Default { updateRegistry }
+    }
 }
 
 # Script Variables - DO NOT CHANGE!
