@@ -2,8 +2,8 @@
 # #################################################################################################################### #
 # Filename: \Intune\PowerShell Scripts\Disable-VerboseStatusMessages.ps1                                               #
 # Repository: Public                                                                                                   #
-# Created Date: Saturday, July 6th 2024, 12:48:11 AM                                                                   #
-# Last Modified: Saturday, July 6th 2024, 1:05:57 AM                                                                   #
+# Created Date: Friday, June 2nd 2023, 5:22:51 PM                                                                      #
+# Last Modified: Monday, July 8th 2024, 2:22:05 PM                                                                     #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 # Github Org: https://github.com/ABYSS-ORG-UK/                                                                         #
@@ -84,10 +84,10 @@ function updateRegistry {
         if ((Get-ItemProperty $i.Path).PSObject.Properties.Name -contains $i.Name) {
             try {
                 Set-ItemProperty -Path $i.Path -Name $i.Name -Value $i.Value -Force -ErrorAction Stop | Out-Null
-                $CUSTOM_LOG.Success("Successfully made the following registry edit:`n - Key: $($i.Path)`n - Property: $($i.Key)`n - Value: $($i.Value)`n - Type: $($i.Type)")
+                $CUSTOM_LOG.Success("Successfully made the following registry edit:`n - Key: $($i.Path)`n - Property: $($i.Name)`n - Value: $($i.Value)`n - Type: $($i.Type)")
             }
             catch {
-                $CUSTOM_LOG.Fail("Failed to make the following registry edit:`n - Key: $($i.Path)`n - Property: $($i.Key)`n - Value: $($i.Value)`n - Type: $($i.Type)")
+                $CUSTOM_LOG.Fail("Failed to make the following registry edit:`n - Key: $($i.Path)`n - Property: $($i.Name)`n - Value: $($i.Value)`n - Type: $($i.Type)")
                 $CUSTOM_LOG.Error($Error[0])
                 Exit 1
             }
@@ -95,10 +95,10 @@ function updateRegistry {
         else {
             try {
                 New-ItemProperty -Path $i.Path -Name $i.Name -Value $i.Value -Type $i.Type -Force -ErrorAction Stop | Out-Null
-                $CUSTOM_LOG.Success("Created the following registry entry:`n - Key: $($i.Path)`n - Property: $($i.Key)`n - Value: $($i.Value)`n - Type: $($i.Type)")
+                $CUSTOM_LOG.Success("Created the following registry entry:`n - Key: $($i.Path)`n - Property: $($i.Name)`n - Value: $($i.Value)`n - Type: $($i.Type)")
             }
             catch {
-                $CUSTOM_LOG.Fail("Failed to make the following registry edit:`n - Key: $($i.Path)`n - Property: $($i.Key)`n - Value: $($i.Value)`n - Type: $($i.Type)")
+                $CUSTOM_LOG.Fail("Failed to make the following registry edit:`n - Key: $($i.Path)`n - Property: $($i.Name)`n - Value: $($i.Value)`n - Type: $($i.Type)")
                 $CUSTOM_LOG.Error($Error[0])
                 Exit 1
             }
