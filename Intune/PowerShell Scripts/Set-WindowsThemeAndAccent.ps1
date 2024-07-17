@@ -3,7 +3,7 @@
 # Filename: \Intune\PowerShell Scripts\Set-WindowsThemeAndAccent.ps1                                                   #
 # Repository: Public                                                                                                   #
 # Created Date: Wednesday, July 17th 2024, 12:21:58 PM                                                                 #
-# Last Modified: Wednesday, July 17th 2024, 12:43:34 PM                                                                #
+# Last Modified: Wednesday, July 17th 2024, 2:36:46 PM                                                                 #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 # Github Org: https://github.com/ABYSS-ORG-UK/                                                                         #
@@ -44,7 +44,7 @@
 #                               #
 #################################
 
-$SCRIPT_NAME = "Set-WindowsThemeAndAccent.ps1"
+$SCRIPT_NAME = "Set-WindowsThemeAndAccent"
 $SCRIPT_EXEC_MODE = "Update" # Update or Delete. Tells the script to either update the registry or delete the keys
 $REG_DATA = @(
     [PSCustomObject]@{
