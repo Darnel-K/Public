@@ -3,7 +3,7 @@
 # Filename: \Intune\PowerShell Scripts\Disable-IPv6.ps1                                                                #
 # Repository: Public                                                                                                   #
 # Created Date: Wednesday, June 14th 2023, 9:52:14 AM                                                                  #
-# Last Modified: Wednesday, August 21st 2024, 4:25:33 PM                                                               #
+# Last Modified: Wednesday, August 21st 2024, 5:26:43 PM                                                               #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 # Github Org: https://github.com/ABYSS-ORG-UK/                                                                         #
@@ -56,7 +56,7 @@ function init {
         foreach ($network_adapter in $network_adapters) {
             $i++
             $percent_complete = ($i / $network_adapters.count) * 100
-            Write-Progress -Id 0 -Activity "Disabling IPv6 Network Adapters" -Status "$([math]::Round($percent_complete))% Complete" -PercentComplete $percent_complete -CurrentOperation "Processing '$($network_adapter.DisplayName)' on adapter '$($network_adapter.Name)"
+            Write-Progress -Id 0 -Activity "Disabling IPv6 Network Adapters" -Status "$([math]::Round($percent_complete))% Complete" -PercentComplete $percent_complete -CurrentOperation "Processing '$($network_adapter.DisplayName)' on adapter '$($network_adapter.Name)'"
             try {
                 Disable-NetAdapterBinding -InputObject $network_adapter
                 $CUSTOM_LOG.Success("Disabled '$($network_adapter.DisplayName)' on '$($network_adapter.Name)'")
