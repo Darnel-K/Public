@@ -2,8 +2,8 @@
 # #################################################################################################################### #
 # Filename: \Intune\PowerShell Scripts\Enable-WindowsPhotoViewer.ps1                                                   #
 # Repository: Public                                                                                                   #
-# Created Date: Friday, June 2nd 2023, 5:22:51 PM                                                                      #
-# Last Modified: Monday, July 8th 2024, 2:22:05 PM                                                                     #
+# Created Date: Thursday, October 3rd 2024, 9:37:17 PM                                                                 #
+# Last Modified: Thursday, October 3rd 2024, 9:57:23 PM                                                                #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 # Github Org: https://github.com/ABYSS-ORG-UK/                                                                         #
@@ -34,13 +34,14 @@
     & .\Enable-WindowsPhotoViewer.ps1
 #>
 
-[CmdletBinding()]
+#################################
+#                               #
+#   REQUIRED SCRIPT VARIABLES   #
+#                               #
+#################################
 
-#################################
-#                               #
-#   USER CHANGEABLE VARIABLES   #
-#                               #
-#################################
+# DO NOT REMOVE THESE VARIABLES
+# DO NOT LEAVE THESE VARIABLES BLANK
 
 $SCRIPT_NAME = "Enable-WindowsPhotoViewer"
 $SCRIPT_EXEC_MODE = "Update" # Update or Delete. Tells the script to either update the registry or delete the keys
@@ -305,10 +306,10 @@ $REG_DATA = @(
 #                                              #
 ################################################
 
-# Script functions
+# Script functions - DO NOT CHANGE!
 
 function updateRegistry {
-    foreach ($i in $REG_DATA) {
+    foreach ($i in ($REG_DATA | Sort-Object -Property Path)) {
         if (!(Test-Path -Path $i.Path)) {
             try {
                 New-Item -Path $i.Path -Force -ErrorAction Stop | Out-Null
@@ -320,26 +321,28 @@ function updateRegistry {
                 Exit 1
             }
         }
-        if ((Get-ItemProperty $i.Path).PSObject.Properties.Name -contains $i.Name) {
-            try {
-                Set-ItemProperty -Path $i.Path -Name $i.Name -Value $i.Value -Force -ErrorAction Stop | Out-Null
-                $CUSTOM_LOG.Success("Successfully made the following registry edit:`n - Key: $($i.Path)`n - Property: $($i.Name)`n - Value: $($i.Value)`n - Type: $($i.Type)")
+        if ($i.Key) {
+            if ((Get-ItemProperty $i.Path).PSObject.Properties.Name -contains $i.Key) {
+                try {
+                    Set-ItemProperty -Path $i.Path -Name $i.Key -Value $i.Value -Force -ErrorAction Stop | Out-Null
+                    $CUSTOM_LOG.Success("Successfully made the following registry edit:`n - Key: $($i.Path)`n - Property: $($i.Key)`n - Value: $($i.Value)`n - Type: $($i.Type)")
+                }
+                catch {
+                    $CUSTOM_LOG.Fail("Failed to make the following registry edit:`n - Key: $($i.Path)`n - Property: $($i.Key)`n - Value: $($i.Value)`n - Type: $($i.Type)")
+                    $CUSTOM_LOG.Error($Error[0])
+                    Exit 1
+                }
             }
-            catch {
-                $CUSTOM_LOG.Fail("Failed to make the following registry edit:`n - Key: $($i.Path)`n - Property: $($i.Name)`n - Value: $($i.Value)`n - Type: $($i.Type)")
-                $CUSTOM_LOG.Error($Error[0])
-                Exit 1
-            }
-        }
-        else {
-            try {
-                New-ItemProperty -Path $i.Path -Name $i.Name -Value $i.Value -Type $i.Type -Force -ErrorAction Stop | Out-Null
-                $CUSTOM_LOG.Success("Created the following registry entry:`n - Key: $($i.Path)`n - Property: $($i.Name)`n - Value: $($i.Value)`n - Type: $($i.Type)")
-            }
-            catch {
-                $CUSTOM_LOG.Fail("Failed to make the following registry edit:`n - Key: $($i.Path)`n - Property: $($i.Name)`n - Value: $($i.Value)`n - Type: $($i.Type)")
-                $CUSTOM_LOG.Error($Error[0])
-                Exit 1
+            else {
+                try {
+                    New-ItemProperty -Path $i.Path -Name $i.Key -Value $i.Value -Type $i.Type -Force -ErrorAction Stop | Out-Null
+                    $CUSTOM_LOG.Success("Created the following registry entry:`n - Key: $($i.Path)`n - Property: $($i.Key)`n - Value: $($i.Value)`n - Type: $($i.Type)")
+                }
+                catch {
+                    $CUSTOM_LOG.Fail("Failed to make the following registry edit:`n - Key: $($i.Path)`n - Property: $($i.Key)`n - Value: $($i.Value)`n - Type: $($i.Type)")
+                    $CUSTOM_LOG.Error($Error[0])
+                    Exit 1
+                }
             }
         }
     }
@@ -348,22 +351,22 @@ function updateRegistry {
 }
 
 function removeRegistry {
-    foreach ($i in $REG_DATA) {
+    foreach ($i in ($REG_DATA | Sort-Object -Property Path, Key -Descending)) {
         if (Test-Path -Path $i.Path) {
-            if ($i.Name) {
+            if ($i.Key) {
                 try {
-                    Remove-ItemProperty -Path $i.Path -Name $i.Name
-                    $CUSTOM_LOG.Success("Removed registry Property:`n - Key: $($i.Path)`n - Property: $($i.Name)")
+                    Remove-ItemProperty -Path $i.Path -Name $i.Key | Out-Null
+                    $CUSTOM_LOG.Success("Removed registry Property:`n - Key: $($i.Path)`n - Property: $($i.Key)")
                 }
                 catch {
-                    $CUSTOM_LOG.Fail("Failed to remove registy property: $($i.Name) at path: $($i.Path)")
+                    $CUSTOM_LOG.Fail("Failed to remove registy property: $($i.Key) at path: $($i.Path)")
                     $CUSTOM_LOG.Error($Error[0])
                     Exit 1
                 }
             }
             else {
                 try {
-                    Remove-Item -Path $i.Path -Recurse -Force
+                    Remove-Item -Path $i.Path -Recurse -Force | Out-Null
                     $CUSTOM_LOG.Success("Removed registry Key:`n - Key: $($i.Path)")
                 }
                 catch {
@@ -372,6 +375,9 @@ function removeRegistry {
                     Exit 1
                 }
             }
+        }
+        else {
+            $CUSTOM_LOG.Information("Registry Path '$($i.Path)' does not exist")
         }
     }
     $CUSTOM_LOG.Success("Completed registry update successfully.")
@@ -386,9 +392,32 @@ function init {
     }
 }
 
-# Script Variables - DO NOT CHANGE!
+function checkRunIn64BitPowershell {
+    if (($env:PROCESSOR_ARCHITECTURE -eq "x86") -or ($env:PROCESSOR_ARCHITEW6432 -eq "AMD64")) {
+        $CUSTOM_LOG.Warning("'$SCRIPT_NAME' is running in 32-bit (x86) mode")
+        try {
+            $CUSTOM_LOG.Information("Attempting to start $SCRIPT_NAME in 64-bit (x64) mode")
+            Start-Process -FilePath "$env:windir\SysNative\WindowsPowershell\v1.0\PowerShell.exe" -Wait -NoNewWindow -ArgumentList "-File ""$PSCOMMANDPATH"""
+            Exit 0
+        }
+        catch {
+            $CUSTOM_LOG.Error("Unable to start '$SCRIPT_NAME' in 64-bit (x64) mode")
+            $CUSTOM_LOG.Error($Error[0])
+            Exit 1
+        }
+        Exit 1
+    }
+    else {
+        $CUSTOM_LOG.Information("'$SCRIPT_NAME' is running in 64-bit (x64) mode")
+    }
+}
+
+# Pre-defined Variables - DO NOT CHANGE!
 $SCRIPT_NAME = ".Intune.PSScript.$($SCRIPT_NAME.Replace(' ',''))"
-$IS_ADMIN = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+[Boolean]$IS_SYSTEM = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).Identities.IsSystem
+[Boolean]$IS_ADMIN = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+[String]$EXEC_USER = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).Identities.Name
+[Int]$PID = [System.Diagnostics.Process]::GetCurrentProcess().Id
 
 # Script & Terminal Preferences - DO NOT CHANGE!
 $ProgressPreference = "Continue"
@@ -399,27 +428,40 @@ $VerbosePreference = "SilentlyContinue"
 $WarningPreference = "Continue"
 $host.ui.RawUI.WindowTitle = $SCRIPT_NAME
 
-# Initialise CustomLog class for event log
-$CUSTOM_LOG = [CustomLog]@{log_source = $SCRIPT_NAME }
+# Create new instance of CustomLog class and initialise Event Log - DO NOT CHANGE!
+$CUSTOM_LOG = [CustomLog]::new($SCRIPT_NAME)
 $CUSTOM_LOG.InitEventLog()
 
-# Console Signature
+# Console Signature - DO NOT CHANGE!
 $SCRIPT_FILENAME = $MyInvocation.MyCommand.Name
 function sig {
     $len = @(($SCRIPT_NAME.Length + 13), ($SCRIPT_FILENAME.Length + 10), 20, 42, 29, 40, 63, 62, 61, 44)
     $len_max = ($len | Measure-Object -Maximum).Maximum
-    Write-Host "`t####$('#'*$len_max)####`n`t#   $(' '*$len_max)   #`n`t#   Script Name: $($SCRIPT_NAME)$(' '*($len_max-$len[0]))   #`n`t#   Filename: $($SCRIPT_FILENAME)$(' '*($len_max-$len[1]))   #`n`t#   $(' '*$len_max)   #`n`t#   Author: Darnel Kumar$(' '*($len_max-$len[2]))   #`n`t#   Author GitHub: https://github.com/Darnel-K$(' '*($len_max-$len[3]))   #`n`t#   Copyright $([char]0x00A9) $(Get-Date -Format  'yyyy') Darnel Kumar$(' '*($len_max-$len[4]))   #`n`t#   $(' '*$len_max)   #`n`t#   $('-'*$len_max)   #`n`t#   $(' '*$len_max)   #`n`t#   License: GNU General Public License v3.0$(' '*($len_max-$len[5]))   #`n`t#   $(' '*$len_max)   #`n`t#   This program is distributed in the hope that it will be useful,$(' '*($len_max-$len[6]))   #`n`t#   but WITHOUT ANY WARRANTY; without even the implied warranty of$(' '*($len_max-$len[7]))   #`n`t#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the$(' '*($len_max-$len[8]))   #`n`t#   GNU General Public License for more details.$(' '*($len_max-$len[9]))   #`n`t#   $(' '*$len_max)   #`n`t####$('#'*$len_max)####" -ForegroundColor Green
+    Write-Host "`t####$('#'*$len_max)####`n`t#   $(' '*$len_max)   #`n`t#   Script Name: $($SCRIPT_NAME)$(' '*($len_max-$len[0]))   #`n`t#   Filename: $($SCRIPT_FILENAME)$(' '*($len_max-$len[1]))   #`n`t#   $(' '*$len_max)   #`n`t#   Author: Darnel Kumar$(' '*($len_max-$len[2]))   #`n`t#   Author GitHub: https://github.com/Darnel-K$(' '*($len_max-$len[3]))   #`n`t#   Copyright $([char]0x00A9) $(Get-Date -Format  'yyyy') Darnel Kumar$(' '*($len_max-$len[4]))   #`n`t#   $(' '*$len_max)   #`n`t#   $('-'*$len_max)   #`n`t#   $(' '*$len_max)   #`n`t#   License: GNU General Public License v3.0$(' '*($len_max-$len[5]))   #`n`t#   $(' '*$len_max)   #`n`t#   This program is distributed in the hope that it will be useful,$(' '*($len_max-$len[6]))   #`n`t#   but WITHOUT ANY WARRANTY; without even the implied warranty of$(' '*($len_max-$len[7]))   #`n`t#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the$(' '*($len_max-$len[8]))   #`n`t#   GNU General Public License for more details.$(' '*($len_max-$len[9]))   #`n`t#   $(' '*$len_max)   #`n`t####$('#'*$len_max)####`n" -ForegroundColor Green
 }
 
-# Define CustomLog class
+# Define CustomLog class - DO NOT CHANGE!
 class CustomLog {
-    hidden [string] $log_name
+    [string] $log_name
     [string] $log_source
     hidden [Boolean] $event_log_init
 
     CustomLog() {
         $this.log_name = "ABYSS.ORG.UK"
         $this.event_log_init = $false
+        $this.log_source = "Default"
+    }
+
+    CustomLog([String]$log_source) {
+        $this.log_name = "ABYSS.ORG.UK"
+        $this.event_log_init = $false
+        $this.log_source = $log_source
+    }
+
+    CustomLog([String]$log_name, [String]$log_source) {
+        $this.log_name = $log_name
+        $this.event_log_init = $false
+        $this.log_source = $log_source
     }
 
     [void] InitEventLog() {
@@ -579,4 +621,5 @@ class CustomLog {
 # Clear console & display signature before script initialisation
 Clear-Host
 sig
+checkRunIn64BitPowershell
 init
