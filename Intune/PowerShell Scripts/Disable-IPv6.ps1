@@ -2,8 +2,8 @@
 # #################################################################################################################### #
 # Filename: \Intune\PowerShell Scripts\Disable-IPv6.ps1                                                                #
 # Repository: Public                                                                                                   #
-# Created Date: Wednesday, June 14th 2023, 9:52:14 AM                                                                  #
-# Last Modified: Wednesday, August 21st 2024, 5:26:43 PM                                                               #
+# Created Date: Thursday, October 3rd 2024, 9:37:17 PM                                                                 #
+# Last Modified: Thursday, October 3rd 2024, 9:46:14 PM                                                                #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 # Github Org: https://github.com/ABYSS-ORG-UK/                                                                         #
@@ -33,16 +33,6 @@
 .EXAMPLE
     & .\Disable-IPv6.ps1
 #>
-
-[CmdletBinding()]
-
-#################################
-#                               #
-#   USER CHANGEABLE VARIABLES   #
-#                               #
-#################################
-
-$SCRIPT_NAME = "Disable-IPv6"
 
 # Script functions
 
@@ -82,6 +72,17 @@ function init {
     }
 }
 
+#################################
+#                               #
+#   REQUIRED SCRIPT VARIABLES   #
+#                               #
+#################################
+
+# DO NOT REMOVE THESE VARIABLES
+# DO NOT LEAVE THESE VARIABLES BLANK
+
+$SCRIPT_NAME = "Disable-IPv6" # This is used in the window title and the event log entries.
+
 ################################################
 #                                              #
 #   DO NOT EDIT ANYTHING BELOW THIS MESSAGE!   #
@@ -108,11 +109,12 @@ function checkRunIn64BitPowershell {
     }
 }
 
-# Script Variables - DO NOT CHANGE!
+# Pre-defined Variables - DO NOT CHANGE!
 $SCRIPT_NAME = ".Intune.PSScript.$($SCRIPT_NAME.Replace(' ',''))"
 [Boolean]$IS_SYSTEM = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).Identities.IsSystem
 [Boolean]$IS_ADMIN = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 [String]$EXEC_USER = (New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).Identities.Name
+[Int]$PID = [System.Diagnostics.Process]::GetCurrentProcess().Id
 
 # Script & Terminal Preferences - DO NOT CHANGE!
 $ProgressPreference = "Continue"
@@ -123,27 +125,40 @@ $VerbosePreference = "SilentlyContinue"
 $WarningPreference = "Continue"
 $host.ui.RawUI.WindowTitle = $SCRIPT_NAME
 
-# Initialise CustomLog class for event log
-$CUSTOM_LOG = [CustomLog]@{log_source = $SCRIPT_NAME }
+# Create new instance of CustomLog class and initialise Event Log - DO NOT CHANGE!
+$CUSTOM_LOG = [CustomLog]::new($SCRIPT_NAME)
 $CUSTOM_LOG.InitEventLog()
 
-# Console Signature
+# Console Signature - DO NOT CHANGE!
 $SCRIPT_FILENAME = $MyInvocation.MyCommand.Name
 function sig {
     $len = @(($SCRIPT_NAME.Length + 13), ($SCRIPT_FILENAME.Length + 10), 20, 42, 29, 40, 63, 62, 61, 44)
     $len_max = ($len | Measure-Object -Maximum).Maximum
-    Write-Host "`t####$('#'*$len_max)####`n`t#   $(' '*$len_max)   #`n`t#   Script Name: $($SCRIPT_NAME)$(' '*($len_max-$len[0]))   #`n`t#   Filename: $($SCRIPT_FILENAME)$(' '*($len_max-$len[1]))   #`n`t#   $(' '*$len_max)   #`n`t#   Author: Darnel Kumar$(' '*($len_max-$len[2]))   #`n`t#   Author GitHub: https://github.com/Darnel-K$(' '*($len_max-$len[3]))   #`n`t#   Copyright $([char]0x00A9) $(Get-Date -Format  'yyyy') Darnel Kumar$(' '*($len_max-$len[4]))   #`n`t#   $(' '*$len_max)   #`n`t#   $('-'*$len_max)   #`n`t#   $(' '*$len_max)   #`n`t#   License: GNU General Public License v3.0$(' '*($len_max-$len[5]))   #`n`t#   $(' '*$len_max)   #`n`t#   This program is distributed in the hope that it will be useful,$(' '*($len_max-$len[6]))   #`n`t#   but WITHOUT ANY WARRANTY; without even the implied warranty of$(' '*($len_max-$len[7]))   #`n`t#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the$(' '*($len_max-$len[8]))   #`n`t#   GNU General Public License for more details.$(' '*($len_max-$len[9]))   #`n`t#   $(' '*$len_max)   #`n`t####$('#'*$len_max)####" -ForegroundColor Green
+    Write-Host "`t####$('#'*$len_max)####`n`t#   $(' '*$len_max)   #`n`t#   Script Name: $($SCRIPT_NAME)$(' '*($len_max-$len[0]))   #`n`t#   Filename: $($SCRIPT_FILENAME)$(' '*($len_max-$len[1]))   #`n`t#   $(' '*$len_max)   #`n`t#   Author: Darnel Kumar$(' '*($len_max-$len[2]))   #`n`t#   Author GitHub: https://github.com/Darnel-K$(' '*($len_max-$len[3]))   #`n`t#   Copyright $([char]0x00A9) $(Get-Date -Format  'yyyy') Darnel Kumar$(' '*($len_max-$len[4]))   #`n`t#   $(' '*$len_max)   #`n`t#   $('-'*$len_max)   #`n`t#   $(' '*$len_max)   #`n`t#   License: GNU General Public License v3.0$(' '*($len_max-$len[5]))   #`n`t#   $(' '*$len_max)   #`n`t#   This program is distributed in the hope that it will be useful,$(' '*($len_max-$len[6]))   #`n`t#   but WITHOUT ANY WARRANTY; without even the implied warranty of$(' '*($len_max-$len[7]))   #`n`t#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the$(' '*($len_max-$len[8]))   #`n`t#   GNU General Public License for more details.$(' '*($len_max-$len[9]))   #`n`t#   $(' '*$len_max)   #`n`t####$('#'*$len_max)####`n" -ForegroundColor Green
 }
 
-# Define CustomLog class
+# Define CustomLog class - DO NOT CHANGE!
 class CustomLog {
-    hidden [string] $log_name
+    [string] $log_name
     [string] $log_source
     hidden [Boolean] $event_log_init
 
     CustomLog() {
         $this.log_name = "ABYSS.ORG.UK"
         $this.event_log_init = $false
+        $this.log_source = "Default"
+    }
+
+    CustomLog([String]$log_source) {
+        $this.log_name = "ABYSS.ORG.UK"
+        $this.event_log_init = $false
+        $this.log_source = $log_source
+    }
+
+    CustomLog([String]$log_name, [String]$log_source) {
+        $this.log_name = $log_name
+        $this.event_log_init = $false
+        $this.log_source = $log_source
     }
 
     [void] InitEventLog() {
