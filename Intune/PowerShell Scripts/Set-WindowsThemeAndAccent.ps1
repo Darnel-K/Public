@@ -2,8 +2,8 @@
 # #################################################################################################################### #
 # Filename: \Intune\PowerShell Scripts\Set-WindowsThemeAndAccent.ps1                                                   #
 # Repository: Public                                                                                                   #
-# Created Date: Thursday, October 3rd 2024, 9:37:17 PM                                                                 #
-# Last Modified: Thursday, October 3rd 2024, 10:02:53 PM                                                               #
+# Created Date: Tuesday, October 1st 2024, 9:59:06 PM                                                                  #
+# Last Modified: Sunday, October 6th 2024, 11:21:33 PM                                                                 #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 # Github Org: https://github.com/ABYSS-ORG-UK/                                                                         #
@@ -50,55 +50,55 @@ $SCRIPT_EXEC_MODE = "Update" # Update or Delete. Tells the script to either upda
 $REG_DATA = @(
     [PSCustomObject]@{
         Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" # Registry key path
-        Name  = "SystemUsesLightTheme" # Registry property name
+        Key  = "SystemUsesLightTheme" # Registry property name
         Value = "0" # Registry property value
         Type  = "DWord" # Binary, DWord, ExpandString, MultiString, String or QWord
     }
     [PSCustomObject]@{
         Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" # Registry key path
-        Name  = "AppsUseLightTheme" # Registry property name
+        Key  = "AppsUseLightTheme" # Registry property name
         Value = "0" # Registry property value
         Type  = "DWord" # Binary, DWord, ExpandString, MultiString, String or QWord
     }
     [PSCustomObject]@{
         Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Accent" # Registry key path
-        Name  = "AccentPalette" # Registry property name
+        Key  = "AccentPalette" # Registry property name
         Value = [byte[]](("FB 9D 8B 00 F4 67 62 00 EF 27 33 00 E8 11 23 00 D2 0E 1E 00 9E 09 12 00 6F 03 06 00 69 79 7E 00").Split(' ') | ForEach-Object { "0x$_" }) # Registry property value
         Type  = "Binary" # Binary, DWord, ExpandString, MultiString, String or QWord
     }
     [PSCustomObject]@{
         Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Accent" # Registry key path
-        Name  = "StartColorMenu" # Registry property name
+        Key  = "StartColorMenu" # Registry property name
         Value = "4280159954" # Registry property value
         Type  = "DWord" # Binary, DWord, ExpandString, MultiString, String or QWord
     }
     [PSCustomObject]@{
         Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Accent" # Registry key path
-        Name  = "AccentColorMenu" # Registry property name
+        Key  = "AccentColorMenu" # Registry property name
         Value = "4280488424" # Registry property value
         Type  = "DWord" # Binary, DWord, ExpandString, MultiString, String or QWord
     }
     [PSCustomObject]@{
         Path  = "HKCU:\Software\Microsoft\Windows\DWM" # Registry key path
-        Name  = "AccentColor" # Registry property name
+        Key  = "AccentColor" # Registry property name
         Value = "4280488424" # Registry property value
         Type  = "" # Binary, DWord, ExpandString, MultiString, String or QWord
     }
     [PSCustomObject]@{
         Path  = "HKCU:\Software\Microsoft\Windows\DWM" # Registry key path
-        Name  = "ColorizationAfterglow" # Registry property name
+        Key  = "ColorizationAfterglow" # Registry property name
         Value = "3303543075" # Registry property value
         Type  = "" # Binary, DWord, ExpandString, MultiString, String or QWord
     }
     [PSCustomObject]@{
         Path  = "HKCU:\Software\Microsoft\Windows\DWM" # Registry key path
-        Name  = "ColorizationColor" # Registry property name
+        Key  = "ColorizationColor" # Registry property name
         Value = "3303543075" # Registry property value
         Type  = "" # Binary, DWord, ExpandString, MultiString, String or QWord
     }
     [PSCustomObject]@{
         Path  = "HKCU:\Software\Microsoft\Windows\DWM" # Registry key path
-        Name  = "ColorPrevalence" # Registry property name
+        Key  = "ColorPrevalence" # Registry property name
         Value = "1" # Registry property value
         Type  = "DWord" # Binary, DWord, ExpandString, MultiString, String or QWord
     }
