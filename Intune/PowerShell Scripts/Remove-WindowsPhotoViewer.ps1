@@ -2,8 +2,8 @@
 # #################################################################################################################### #
 # Filename: \Intune\PowerShell Scripts\Remove-WindowsPhotoViewer.ps1                                                   #
 # Repository: Public                                                                                                   #
-# Created Date: Thursday, October 3rd 2024, 9:37:17 PM                                                                 #
-# Last Modified: Thursday, October 3rd 2024, 10:00:43 PM                                                               #
+# Created Date: Tuesday, October 1st 2024, 9:59:06 PM                                                                  #
+# Last Modified: Sunday, October 6th 2024, 11:21:33 PM                                                                 #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 # Github Org: https://github.com/ABYSS-ORG-UK/                                                                         #
@@ -69,11 +69,11 @@ $REG_DATA = @(
     }
     [PSCustomObject]@{
         Path = "HKLM:\SOFTWARE\Classes\jpegfile\shell\open\DropTarget"
-        Name = "Clsid"
+        Key = "Clsid"
     }
     [PSCustomObject]@{
         Path = "HKLM:\SOFTWARE\Classes\pngfile\shell\open\DropTarget"
-        Name = "Clsid"
+        Key = "Clsid"
     }
 )
 
