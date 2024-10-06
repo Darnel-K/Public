@@ -2,8 +2,8 @@
 # #################################################################################################################### #
 # Filename: \Intune\PowerShell Scripts\Set-FolderOptions.ps1                                                           #
 # Repository: Public                                                                                                   #
-# Created Date: Thursday, October 3rd 2024, 9:37:17 PM                                                                 #
-# Last Modified: Thursday, October 3rd 2024, 10:01:11 PM                                                               #
+# Created Date: Tuesday, October 1st 2024, 9:59:06 PM                                                                  #
+# Last Modified: Sunday, October 6th 2024, 11:21:33 PM                                                                 #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 # Github Org: https://github.com/ABYSS-ORG-UK/                                                                         #
@@ -53,31 +53,31 @@ $SCRIPT_EXEC_MODE = "Update" # Update or Delete. Tells the script to either upda
 $REG_DATA = @(
     [PSCustomObject]@{
         Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
-        Name  = "Hidden"
+        Key  = "Hidden"
         Value = "1"
         Type  = "DWord"
     }
     [PSCustomObject]@{
         Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
-        Name  = "HideDrivesWithNoMedia"
+        Key  = "HideDrivesWithNoMedia"
         Value = "0"
         Type  = "DWord"
     }
     [PSCustomObject]@{
         Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
-        Name  = "ShowEncryptCompressedColor"
+        Key  = "ShowEncryptCompressedColor"
         Value = "1"
         Type  = "DWord"
     }
     [PSCustomObject]@{
         Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
-        Name  = "HideFileExt"
+        Key  = "HideFileExt"
         Value = "0"
         Type  = "DWord"
     }
     [PSCustomObject]@{
         Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\CabinetState"
-        Name  = "FullPath"
+        Key  = "FullPath"
         Value = "1"
         Type  = "DWord"
     }
