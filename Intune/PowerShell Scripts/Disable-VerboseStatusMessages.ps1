@@ -2,8 +2,8 @@
 # #################################################################################################################### #
 # Filename: \Intune\PowerShell Scripts\Disable-VerboseStatusMessages.ps1                                               #
 # Repository: Public                                                                                                   #
-# Created Date: Thursday, October 3rd 2024, 9:37:17 PM                                                                 #
-# Last Modified: Thursday, October 3rd 2024, 9:53:32 PM                                                                #
+# Created Date: Tuesday, October 1st 2024, 9:59:06 PM                                                                  #
+# Last Modified: Sunday, October 6th 2024, 11:21:33 PM                                                                 #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 # Github Org: https://github.com/ABYSS-ORG-UK/                                                                         #
@@ -49,13 +49,13 @@ $REG_KEY_PATH = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System
 $REG_DATA = @(
     [PSCustomObject]@{
         Path  = $REG_KEY_PATH
-        Name  = "verbosestatus"
+        Key  = "verbosestatus"
         Value = "0"
         Type  = "DWord"
     }
     [PSCustomObject]@{
         Path  = $REG_KEY_PATH
-        Name  = "DisableStatusMessages"
+        Key  = "DisableStatusMessages"
         Value = "1"
         Type  = "DWord"
     }
