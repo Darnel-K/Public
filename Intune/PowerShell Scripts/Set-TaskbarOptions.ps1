@@ -2,8 +2,8 @@
 # #################################################################################################################### #
 # Filename: \Intune\PowerShell Scripts\Set-TaskbarOptions.ps1                                                          #
 # Repository: Public                                                                                                   #
-# Created Date: Thursday, October 3rd 2024, 9:37:17 PM                                                                 #
-# Last Modified: Thursday, October 3rd 2024, 10:01:54 PM                                                               #
+# Created Date: Tuesday, October 1st 2024, 9:59:06 PM                                                                  #
+# Last Modified: Sunday, October 6th 2024, 11:21:33 PM                                                                 #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 # Github Org: https://github.com/ABYSS-ORG-UK/                                                                         #
@@ -54,25 +54,25 @@ $SCRIPT_EXEC_MODE = "Update" # Update or Delete. Tells the script to either upda
 $REG_DATA = @(
     [PSCustomObject]@{
         Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
-        Name  = "ShowTaskViewButton" # Shows / Hides Task View Taskbar Button: 0 = Hidden, 1 = Shown
+        Key  = "ShowTaskViewButton" # Shows / Hides Task View Taskbar Button: 0 = Hidden, 1 = Shown
         Value = "0"
         Type  = "DWord"
     }
     [PSCustomObject]@{
         Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
-        Name  = "TaskbarMn" # Shows / Hides Chat Taskbar Button: 0 = Hidden, 1 = Shown
+        Key  = "TaskbarMn" # Shows / Hides Chat Taskbar Button: 0 = Hidden, 1 = Shown
         Value = "0"
         Type  = "DWord"
     }
     [PSCustomObject]@{
         Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
-        Name  = "TaskbarDa" # Shows / Hides Widgets Taskbar Button: 0 = Hidden, 1 = Shown
+        Key  = "TaskbarDa" # Shows / Hides Widgets Taskbar Button: 0 = Hidden, 1 = Shown
         Value = "0"
         Type  = "DWord"
     }
     [PSCustomObject]@{
         Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
-        Name  = "TaskbarAl" # Aligns Taskbar to the left or center: 0 = Left, 1 = Center
+        Key  = "TaskbarAl" # Aligns Taskbar to the left or center: 0 = Left, 1 = Center
         Value = "0"
         Type  = "DWord"
     }
