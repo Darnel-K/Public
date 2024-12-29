@@ -3,7 +3,7 @@
 # Filename: \Intune\PowerShell Scripts\Set-MaintenanceScheduledTasks.ps1                                               #
 # Repository: Public                                                                                                   #
 # Created Date: Friday, December 27th 2024, 10:55:46 PM                                                                #
-# Last Modified: Saturday, December 28th 2024, 2:48:27 AM                                                              #
+# Last Modified: Sunday, December 29th 2024, 12:27:29 AM                                                               #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 # Github Org: https://github.com/ABYSS-ORG-UK/                                                                         #
@@ -94,41 +94,68 @@ function updateRegistry {
 }
 
 function init {
-    # Script initialisation function. This function contains the main code and calls to other functions.
-    # This function is called automatically at the bottom of the script
     updateRegistry
-    $TASK_NAME = "ScheduledMaintenance"
-    $TASK_FOLDER_NAME = "ABYSS.ORG.UK"
-    $tasks = @(); $tasks += (Get-ScheduledTask -TaskName "$TASK_NAME" -ErrorAction SilentlyContinue | Where-Object -Property TaskPath -Like "*$TASK_FOLDER_NAME*")
-    if (($tasks).Count -gt 0) {
-        $CUSTOM_LOG.Information("Scheduled task already exists. The existing task will be replaced with the deployed task")
-        try {
-            foreach ($task in $tasks) {
-                $task | Unregister-ScheduledTask -Confirm:$false
+    $NEW_TASKS = @(
+        [PSCustomObject]@{
+            Name   = "ScheduledMaintenance"
+            Folder = "ABYSS.ORG.UK"
+            B64XML = "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTE2Ij8+DQo8VGFzayB2ZXJzaW9uPSIxLjQiIHhtbG5zPSJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dpbmRvd3MvMjAwNC8wMi9taXQvdGFzayI+DQogIDxSZWdpc3RyYXRpb25JbmZvPg0KICAgIDxEYXRlPjIwMjQtMTItMjhUMDA6MzI6MjMuODk1MTwvRGF0ZT4NCiAgICA8QXV0aG9yPkFCWVNTXGRhcm5lbC5rdW1hcjwvQXV0aG9yPg0KICAgIDxVUkk+XEFCWVNTLk9SRy5VS1xTY2hlZHVsZWRNYWludGVuYW5jZTwvVVJJPg0KICA8L1JlZ2lzdHJhdGlvbkluZm8+DQogIDxUcmlnZ2Vycz4NCiAgICA8Q2FsZW5kYXJUcmlnZ2VyPg0KICAgICAgPFN0YXJ0Qm91bmRhcnk+MjAyNC0xMi0yN1QxMjowMDowMDwvU3RhcnRCb3VuZGFyeT4NCiAgICAgIDxFbmFibGVkPnRydWU8L0VuYWJsZWQ+DQogICAgICA8U2NoZWR1bGVCeU1vbnRoPg0KICAgICAgICA8RGF5c09mTW9udGg+DQogICAgICAgICAgPERheT4xPC9EYXk+DQogICAgICAgIDwvRGF5c09mTW9udGg+DQogICAgICAgIDxNb250aHM+DQogICAgICAgICAgPEphbnVhcnkgLz4NCiAgICAgICAgICA8RmVicnVhcnkgLz4NCiAgICAgICAgICA8TWFyY2ggLz4NCiAgICAgICAgICA8QXByaWwgLz4NCiAgICAgICAgICA8TWF5IC8+DQogICAgICAgICAgPEp1bmUgLz4NCiAgICAgICAgICA8SnVseSAvPg0KICAgICAgICAgIDxBdWd1c3QgLz4NCiAgICAgICAgICA8U2VwdGVtYmVyIC8+DQogICAgICAgICAgPE9jdG9iZXIgLz4NCiAgICAgICAgICA8Tm92ZW1iZXIgLz4NCiAgICAgICAgICA8RGVjZW1iZXIgLz4NCiAgICAgICAgPC9Nb250aHM+DQogICAgICA8L1NjaGVkdWxlQnlNb250aD4NCiAgICA8L0NhbGVuZGFyVHJpZ2dlcj4NCiAgICA8RXZlbnRUcmlnZ2VyPg0KICAgICAgPEVuYWJsZWQ+dHJ1ZTwvRW5hYmxlZD4NCiAgICAgIDxTdWJzY3JpcHRpb24+Jmx0O1F1ZXJ5TGlzdCZndDsmbHQ7UXVlcnkgSWQ9IjAiIFBhdGg9IlN5c3RlbSImZ3Q7Jmx0O1NlbGVjdCBQYXRoPSJTeXN0ZW0iJmd0OypbU3lzdGVtW0V2ZW50SUQ9NDFdXSZsdDsvU2VsZWN0Jmd0OyZsdDsvUXVlcnkmZ3Q7Jmx0Oy9RdWVyeUxpc3QmZ3Q7PC9TdWJzY3JpcHRpb24+DQogICAgICA8RGVsYXk+UFQ1TTwvRGVsYXk+DQogICAgPC9FdmVudFRyaWdnZXI+DQogICAgPFJlZ2lzdHJhdGlvblRyaWdnZXI+DQogICAgICA8RW5hYmxlZD50cnVlPC9FbmFibGVkPg0KICAgIDwvUmVnaXN0cmF0aW9uVHJpZ2dlcj4NCiAgPC9UcmlnZ2Vycz4NCiAgPFByaW5jaXBhbHM+DQogICAgPFByaW5jaXBhbCBpZD0iQXV0aG9yIj4NCiAgICAgIDxVc2VySWQ+Uy0xLTUtMTg8L1VzZXJJZD4NCiAgICAgIDxSdW5MZXZlbD5IaWdoZXN0QXZhaWxhYmxlPC9SdW5MZXZlbD4NCiAgICA8L1ByaW5jaXBhbD4NCiAgPC9QcmluY2lwYWxzPg0KICA8U2V0dGluZ3M+DQogICAgPE11bHRpcGxlSW5zdGFuY2VzUG9saWN5Pklnbm9yZU5ldzwvTXVsdGlwbGVJbnN0YW5jZXNQb2xpY3k+DQogICAgPERpc2FsbG93U3RhcnRJZk9uQmF0dGVyaWVzPmZhbHNlPC9EaXNhbGxvd1N0YXJ0SWZPbkJhdHRlcmllcz4NCiAgICA8U3RvcElmR29pbmdPbkJhdHRlcmllcz5mYWxzZTwvU3RvcElmR29pbmdPbkJhdHRlcmllcz4NCiAgICA8QWxsb3dIYXJkVGVybWluYXRlPmZhbHNlPC9BbGxvd0hhcmRUZXJtaW5hdGU+DQogICAgPFN0YXJ0V2hlbkF2YWlsYWJsZT50cnVlPC9TdGFydFdoZW5BdmFpbGFibGU+DQogICAgPFJ1bk9ubHlJZk5ldHdvcmtBdmFpbGFibGU+dHJ1ZTwvUnVuT25seUlmTmV0d29ya0F2YWlsYWJsZT4NCiAgICA8SWRsZVNldHRpbmdzPg0KICAgICAgPFN0b3BPbklkbGVFbmQ+ZmFsc2U8L1N0b3BPbklkbGVFbmQ+DQogICAgICA8UmVzdGFydE9uSWRsZT5mYWxzZTwvUmVzdGFydE9uSWRsZT4NCiAgICA8L0lkbGVTZXR0aW5ncz4NCiAgICA8QWxsb3dTdGFydE9uRGVtYW5kPnRydWU8L0FsbG93U3RhcnRPbkRlbWFuZD4NCiAgICA8RW5hYmxlZD50cnVlPC9FbmFibGVkPg0KICAgIDxIaWRkZW4+ZmFsc2U8L0hpZGRlbj4NCiAgICA8UnVuT25seUlmSWRsZT5mYWxzZTwvUnVuT25seUlmSWRsZT4NCiAgICA8RGlzYWxsb3dTdGFydE9uUmVtb3RlQXBwU2Vzc2lvbj5mYWxzZTwvRGlzYWxsb3dTdGFydE9uUmVtb3RlQXBwU2Vzc2lvbj4NCiAgICA8VXNlVW5pZmllZFNjaGVkdWxpbmdFbmdpbmU+dHJ1ZTwvVXNlVW5pZmllZFNjaGVkdWxpbmdFbmdpbmU+DQogICAgPFdha2VUb1J1bj50cnVlPC9XYWtlVG9SdW4+DQogICAgPEV4ZWN1dGlvblRpbWVMaW1pdD5QVDBTPC9FeGVjdXRpb25UaW1lTGltaXQ+DQogICAgPFByaW9yaXR5Pjc8L1ByaW9yaXR5Pg0KICAgIDxSZXN0YXJ0T25GYWlsdXJlPg0KICAgICAgPEludGVydmFsPlBUNU08L0ludGVydmFsPg0KICAgICAgPENvdW50PjM8L0NvdW50Pg0KICAgIDwvUmVzdGFydE9uRmFpbHVyZT4NCiAgPC9TZXR0aW5ncz4NCiAgPEFjdGlvbnMgQ29udGV4dD0iQXV0aG9yIj4NCiAgICA8RXhlYz4NCiAgICAgIDxDb21tYW5kPkM6XFdpbmRvd3NcU3lzdGVtMzJcbmV0c2guZXhlPC9Db21tYW5kPg0KICAgICAgPEFyZ3VtZW50cz53aW5zb2NrIHJlc2V0PC9Bcmd1bWVudHM+DQogICAgPC9FeGVjPg0KICAgIDxFeGVjPg0KICAgICAgPENvbW1hbmQ+QzpcV2luZG93c1xTeXN0ZW0zMlxzZmMuZXhlPC9Db21tYW5kPg0KICAgICAgPEFyZ3VtZW50cz4vc2Nhbm5vdzwvQXJndW1lbnRzPg0KICAgIDwvRXhlYz4NCiAgICA8RXhlYz4NCiAgICAgIDxDb21tYW5kPkM6XFdpbmRvd3NcU3lzdGVtMzJcRGlzbS5leGU8L0NvbW1hbmQ+DQogICAgICA8QXJndW1lbnRzPi9PbmxpbmUgL0NsZWFudXAtSW1hZ2UgL1Jlc3RvcmVIZWFsdGg8L0FyZ3VtZW50cz4NCiAgICA8L0V4ZWM+DQogICAgPEV4ZWM+DQogICAgICA8Q29tbWFuZD5DOlxXaW5kb3dzXFN5c3RlbTMyXGNsZWFubWdyLmV4ZTwvQ29tbWFuZD4NCiAgICAgIDxBcmd1bWVudHM+L3NhZ2VydW46MjA0ODwvQXJndW1lbnRzPg0KICAgIDwvRXhlYz4NCiAgPC9BY3Rpb25zPg0KPC9UYXNrPg0K"
+            System = $true
+        }
+        [PSCustomObject]@{
+            Name   = "ScheduledCleanup"
+            Folder = "ABYSS.ORG.UK"
+            B64XML = "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTE2Ij8+DQo8VGFzayB2ZXJzaW9uPSIxLjQiIHhtbG5zPSJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dpbmRvd3MvMjAwNC8wMi9taXQvdGFzayI+DQogIDxSZWdpc3RyYXRpb25JbmZvPg0KICAgIDxEYXRlPjIwMjQtMTItMjhUMjM6Mjk6NDAuNDU1MDY3MTwvRGF0ZT4NCiAgICA8QXV0aG9yPkFCWVNTXGRhcm5lbC5rdW1hcjwvQXV0aG9yPg0KICAgIDxVUkk+XEFCWVNTLk9SRy5VS1xTY2hlZHVsZWRDbGVhbnVwPC9VUkk+DQogIDwvUmVnaXN0cmF0aW9uSW5mbz4NCiAgPFRyaWdnZXJzPg0KICAgIDxDYWxlbmRhclRyaWdnZXI+DQogICAgICA8U3RhcnRCb3VuZGFyeT4yMDI1LTAxLTAxVDEyOjAwOjAwKzAwOjAwPC9TdGFydEJvdW5kYXJ5Pg0KICAgICAgPEVuYWJsZWQ+dHJ1ZTwvRW5hYmxlZD4NCiAgICAgIDxTY2hlZHVsZUJ5RGF5Pg0KICAgICAgICA8RGF5c0ludGVydmFsPjkwPC9EYXlzSW50ZXJ2YWw+DQogICAgICA8L1NjaGVkdWxlQnlEYXk+DQogICAgPC9DYWxlbmRhclRyaWdnZXI+DQogICAgPFJlZ2lzdHJhdGlvblRyaWdnZXI+DQogICAgICA8RW5hYmxlZD50cnVlPC9FbmFibGVkPg0KICAgIDwvUmVnaXN0cmF0aW9uVHJpZ2dlcj4NCiAgPC9UcmlnZ2Vycz4NCiAgPFByaW5jaXBhbHM+DQogICAgPFByaW5jaXBhbCBpZD0iQXV0aG9yIj4NCiAgICAgIDxHcm91cElkPlMtMS01LTMyLTU0NTwvR3JvdXBJZD4NCiAgICAgIDxSdW5MZXZlbD5MZWFzdFByaXZpbGVnZTwvUnVuTGV2ZWw+DQogICAgPC9QcmluY2lwYWw+DQogIDwvUHJpbmNpcGFscz4NCiAgPFNldHRpbmdzPg0KICAgIDxNdWx0aXBsZUluc3RhbmNlc1BvbGljeT5TdG9wRXhpc3Rpbmc8L011bHRpcGxlSW5zdGFuY2VzUG9saWN5Pg0KICAgIDxEaXNhbGxvd1N0YXJ0SWZPbkJhdHRlcmllcz5mYWxzZTwvRGlzYWxsb3dTdGFydElmT25CYXR0ZXJpZXM+DQogICAgPFN0b3BJZkdvaW5nT25CYXR0ZXJpZXM+ZmFsc2U8L1N0b3BJZkdvaW5nT25CYXR0ZXJpZXM+DQogICAgPEFsbG93SGFyZFRlcm1pbmF0ZT5mYWxzZTwvQWxsb3dIYXJkVGVybWluYXRlPg0KICAgIDxTdGFydFdoZW5BdmFpbGFibGU+dHJ1ZTwvU3RhcnRXaGVuQXZhaWxhYmxlPg0KICAgIDxSdW5Pbmx5SWZOZXR3b3JrQXZhaWxhYmxlPmZhbHNlPC9SdW5Pbmx5SWZOZXR3b3JrQXZhaWxhYmxlPg0KICAgIDxJZGxlU2V0dGluZ3M+DQogICAgICA8U3RvcE9uSWRsZUVuZD5mYWxzZTwvU3RvcE9uSWRsZUVuZD4NCiAgICAgIDxSZXN0YXJ0T25JZGxlPmZhbHNlPC9SZXN0YXJ0T25JZGxlPg0KICAgIDwvSWRsZVNldHRpbmdzPg0KICAgIDxBbGxvd1N0YXJ0T25EZW1hbmQ+dHJ1ZTwvQWxsb3dTdGFydE9uRGVtYW5kPg0KICAgIDxFbmFibGVkPnRydWU8L0VuYWJsZWQ+DQogICAgPEhpZGRlbj5mYWxzZTwvSGlkZGVuPg0KICAgIDxSdW5Pbmx5SWZJZGxlPmZhbHNlPC9SdW5Pbmx5SWZJZGxlPg0KICAgIDxEaXNhbGxvd1N0YXJ0T25SZW1vdGVBcHBTZXNzaW9uPmZhbHNlPC9EaXNhbGxvd1N0YXJ0T25SZW1vdGVBcHBTZXNzaW9uPg0KICAgIDxVc2VVbmlmaWVkU2NoZWR1bGluZ0VuZ2luZT50cnVlPC9Vc2VVbmlmaWVkU2NoZWR1bGluZ0VuZ2luZT4NCiAgICA8V2FrZVRvUnVuPnRydWU8L1dha2VUb1J1bj4NCiAgICA8RXhlY3V0aW9uVGltZUxpbWl0PlBUMFM8L0V4ZWN1dGlvblRpbWVMaW1pdD4NCiAgICA8UHJpb3JpdHk+NzwvUHJpb3JpdHk+DQogICAgPFJlc3RhcnRPbkZhaWx1cmU+DQogICAgICA8SW50ZXJ2YWw+UFQ1TTwvSW50ZXJ2YWw+DQogICAgICA8Q291bnQ+MzwvQ291bnQ+DQogICAgPC9SZXN0YXJ0T25GYWlsdXJlPg0KICA8L1NldHRpbmdzPg0KICA8QWN0aW9ucyBDb250ZXh0PSJBdXRob3IiPg0KICAgIDxFeGVjPg0KICAgICAgPENvbW1hbmQ+QzpcV2luZG93c1xTeXN0ZW0zMlxjbGVhbm1nci5leGU8L0NvbW1hbmQ+DQogICAgICA8QXJndW1lbnRzPi9zYWdlcnVuOjIwNDg8L0FyZ3VtZW50cz4NCiAgICA8L0V4ZWM+DQogIDwvQWN0aW9ucz4NCjwvVGFzaz4NCg=="
+            System = $false
+        }
+    )
+    foreach ($new_task in $NEW_TASKS) {
+        $existing_tasks = @()
+        $existing_tasks += (Get-ScheduledTask -TaskName "$($new_task.Name)" -ErrorAction SilentlyContinue | Where-Object -Property TaskPath -Like "*$($new_task.Folder)*")
+        if (($existing_tasks).Count -gt 0) {
+            $CUSTOM_LOG.Information("Scheduled task '$($new_task.Name)' already exists, the existing task will be replaced with the deployed task")
+            try {
+                foreach ($existing_task in $existing_tasks) {
+                    $existing_task | Unregister-ScheduledTask -Confirm:$false
+                    $CUSTOM_LOG.Information("Scheduled task '$($existing_task.TaskName)' has been unregistered")
+                }
             }
-            $CUSTOM_LOG.Success("The existing task(s) have been removed")
+            catch {
+                $CUSTOM_LOG.Fail("Something went wrong, unable to remove existing task '$($existing_task.TaskName)'")
+                $CUSTOM_LOG.Error($Error)
+                Exit 1
+            }
+        }
+        $tmp_file = New-TemporaryFile
+        $CUSTOM_LOG.Information("Created temporary file '$($tmp_file.FullName)'")
+        $CUSTOM_LOG.Information("Decoding & exporting Base64 XML date to temporary file")
+        try {
+            Out-File -FilePath $tmp_file -InputObject ([Text.Encoding]::Utf8.GetString([Convert]::FromBase64String($new_task.B64XML)))
+            $CUSTOM_LOG.Information("Decoded & exported Base64 XML date to temporary file")
         }
         catch {
-            $CUSTOM_LOG.Fail("Something went wrong, unable to remove the existing task(s)")
+            $CUSTOM_LOG.Fail("Something went wrong, unable to decode and export xml data to temporary file")
+            $CUSTOM_LOG.Error($Error)
+            Exit 1
+        }
+        try {
+            if ($new_task.System) {
+                Start-Process -FilePath "$env:windir\System32\schtasks.exe" -ArgumentList "/Create /ru System /XML `"$($tmp_file.FullName)`" /TN `"$($new_task.Folder)\$($new_task.Name)`"" -Verb RunAs -Wait -WindowStyle Hidden
+                $CUSTOM_LOG.Success("Imported scheduled task '$($new_task.Name)' XML data")
+            }
+            else {
+                Start-Process -FilePath "$env:windir\System32\schtasks.exe" -ArgumentList "/Create /XML `"$($tmp_file.FullName)`" /TN `"$($new_task.Folder)\$($new_task.Name)`"" -Verb RunAs -Wait -WindowStyle Hidden
+                $CUSTOM_LOG.Success("Imported scheduled task '$($new_task.Name)' XML data")
+            }
+
+        }
+        catch {
+            $CUSTOM_LOG.Fail("Something went wrong, unable to import scheduled task from temporary file")
             $CUSTOM_LOG.Error($Error)
             Exit 1
         }
     }
-    $tmp_file = New-TemporaryFile
-    $CUSTOM_LOG.Information("Created temporary file '$($tmp_file.FullName)'")
-    $b64_xml = "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTE2Ij8+DQo8VGFzayB2ZXJzaW9uPSIxLjQiIHhtbG5zPSJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dpbmRvd3MvMjAwNC8wMi9taXQvdGFzayI+DQogIDxSZWdpc3RyYXRpb25JbmZvPg0KICAgIDxEYXRlPjIwMjQtMTItMjhUMDA6MzI6MjMuODk1MTwvRGF0ZT4NCiAgICA8QXV0aG9yPkFCWVNTXGRhcm5lbC5rdW1hcjwvQXV0aG9yPg0KICAgIDxVUkk+XEFCWVNTLk9SRy5VS1xTY2hlZHVsZWRNYWludGVuYW5jZTwvVVJJPg0KICA8L1JlZ2lzdHJhdGlvbkluZm8+DQogIDxUcmlnZ2Vycz4NCiAgICA8Q2FsZW5kYXJUcmlnZ2VyPg0KICAgICAgPFN0YXJ0Qm91bmRhcnk+MjAyNC0xMi0yN1QxMjowMDowMDwvU3RhcnRCb3VuZGFyeT4NCiAgICAgIDxFbmFibGVkPnRydWU8L0VuYWJsZWQ+DQogICAgICA8U2NoZWR1bGVCeU1vbnRoPg0KICAgICAgICA8RGF5c09mTW9udGg+DQogICAgICAgICAgPERheT4xPC9EYXk+DQogICAgICAgIDwvRGF5c09mTW9udGg+DQogICAgICAgIDxNb250aHM+DQogICAgICAgICAgPEphbnVhcnkgLz4NCiAgICAgICAgICA8RmVicnVhcnkgLz4NCiAgICAgICAgICA8TWFyY2ggLz4NCiAgICAgICAgICA8QXByaWwgLz4NCiAgICAgICAgICA8TWF5IC8+DQogICAgICAgICAgPEp1bmUgLz4NCiAgICAgICAgICA8SnVseSAvPg0KICAgICAgICAgIDxBdWd1c3QgLz4NCiAgICAgICAgICA8U2VwdGVtYmVyIC8+DQogICAgICAgICAgPE9jdG9iZXIgLz4NCiAgICAgICAgICA8Tm92ZW1iZXIgLz4NCiAgICAgICAgICA8RGVjZW1iZXIgLz4NCiAgICAgICAgPC9Nb250aHM+DQogICAgICA8L1NjaGVkdWxlQnlNb250aD4NCiAgICA8L0NhbGVuZGFyVHJpZ2dlcj4NCiAgICA8RXZlbnRUcmlnZ2VyPg0KICAgICAgPEVuYWJsZWQ+dHJ1ZTwvRW5hYmxlZD4NCiAgICAgIDxTdWJzY3JpcHRpb24+Jmx0O1F1ZXJ5TGlzdCZndDsmbHQ7UXVlcnkgSWQ9IjAiIFBhdGg9IlN5c3RlbSImZ3Q7Jmx0O1NlbGVjdCBQYXRoPSJTeXN0ZW0iJmd0OypbU3lzdGVtW0V2ZW50SUQ9NDFdXSZsdDsvU2VsZWN0Jmd0OyZsdDsvUXVlcnkmZ3Q7Jmx0Oy9RdWVyeUxpc3QmZ3Q7PC9TdWJzY3JpcHRpb24+DQogICAgICA8RGVsYXk+UFQ1TTwvRGVsYXk+DQogICAgPC9FdmVudFRyaWdnZXI+DQogICAgPFJlZ2lzdHJhdGlvblRyaWdnZXI+DQogICAgICA8RW5hYmxlZD50cnVlPC9FbmFibGVkPg0KICAgIDwvUmVnaXN0cmF0aW9uVHJpZ2dlcj4NCiAgPC9UcmlnZ2Vycz4NCiAgPFByaW5jaXBhbHM+DQogICAgPFByaW5jaXBhbCBpZD0iQXV0aG9yIj4NCiAgICAgIDxVc2VySWQ+Uy0xLTUtMTg8L1VzZXJJZD4NCiAgICAgIDxSdW5MZXZlbD5IaWdoZXN0QXZhaWxhYmxlPC9SdW5MZXZlbD4NCiAgICA8L1ByaW5jaXBhbD4NCiAgPC9QcmluY2lwYWxzPg0KICA8U2V0dGluZ3M+DQogICAgPE11bHRpcGxlSW5zdGFuY2VzUG9saWN5Pklnbm9yZU5ldzwvTXVsdGlwbGVJbnN0YW5jZXNQb2xpY3k+DQogICAgPERpc2FsbG93U3RhcnRJZk9uQmF0dGVyaWVzPmZhbHNlPC9EaXNhbGxvd1N0YXJ0SWZPbkJhdHRlcmllcz4NCiAgICA8U3RvcElmR29pbmdPbkJhdHRlcmllcz5mYWxzZTwvU3RvcElmR29pbmdPbkJhdHRlcmllcz4NCiAgICA8QWxsb3dIYXJkVGVybWluYXRlPmZhbHNlPC9BbGxvd0hhcmRUZXJtaW5hdGU+DQogICAgPFN0YXJ0V2hlbkF2YWlsYWJsZT50cnVlPC9TdGFydFdoZW5BdmFpbGFibGU+DQogICAgPFJ1bk9ubHlJZk5ldHdvcmtBdmFpbGFibGU+dHJ1ZTwvUnVuT25seUlmTmV0d29ya0F2YWlsYWJsZT4NCiAgICA8SWRsZVNldHRpbmdzPg0KICAgICAgPFN0b3BPbklkbGVFbmQ+ZmFsc2U8L1N0b3BPbklkbGVFbmQ+DQogICAgICA8UmVzdGFydE9uSWRsZT5mYWxzZTwvUmVzdGFydE9uSWRsZT4NCiAgICA8L0lkbGVTZXR0aW5ncz4NCiAgICA8QWxsb3dTdGFydE9uRGVtYW5kPnRydWU8L0FsbG93U3RhcnRPbkRlbWFuZD4NCiAgICA8RW5hYmxlZD50cnVlPC9FbmFibGVkPg0KICAgIDxIaWRkZW4+ZmFsc2U8L0hpZGRlbj4NCiAgICA8UnVuT25seUlmSWRsZT5mYWxzZTwvUnVuT25seUlmSWRsZT4NCiAgICA8RGlzYWxsb3dTdGFydE9uUmVtb3RlQXBwU2Vzc2lvbj5mYWxzZTwvRGlzYWxsb3dTdGFydE9uUmVtb3RlQXBwU2Vzc2lvbj4NCiAgICA8VXNlVW5pZmllZFNjaGVkdWxpbmdFbmdpbmU+dHJ1ZTwvVXNlVW5pZmllZFNjaGVkdWxpbmdFbmdpbmU+DQogICAgPFdha2VUb1J1bj50cnVlPC9XYWtlVG9SdW4+DQogICAgPEV4ZWN1dGlvblRpbWVMaW1pdD5QVDBTPC9FeGVjdXRpb25UaW1lTGltaXQ+DQogICAgPFByaW9yaXR5Pjc8L1ByaW9yaXR5Pg0KICAgIDxSZXN0YXJ0T25GYWlsdXJlPg0KICAgICAgPEludGVydmFsPlBUNU08L0ludGVydmFsPg0KICAgICAgPENvdW50PjM8L0NvdW50Pg0KICAgIDwvUmVzdGFydE9uRmFpbHVyZT4NCiAgPC9TZXR0aW5ncz4NCiAgPEFjdGlvbnMgQ29udGV4dD0iQXV0aG9yIj4NCiAgICA8RXhlYz4NCiAgICAgIDxDb21tYW5kPkM6XFdpbmRvd3NcU3lzdGVtMzJcbmV0c2guZXhlPC9Db21tYW5kPg0KICAgICAgPEFyZ3VtZW50cz53aW5zb2NrIHJlc2V0PC9Bcmd1bWVudHM+DQogICAgPC9FeGVjPg0KICAgIDxFeGVjPg0KICAgICAgPENvbW1hbmQ+QzpcV2luZG93c1xTeXN0ZW0zMlxzZmMuZXhlPC9Db21tYW5kPg0KICAgICAgPEFyZ3VtZW50cz4vc2Nhbm5vdzwvQXJndW1lbnRzPg0KICAgIDwvRXhlYz4NCiAgICA8RXhlYz4NCiAgICAgIDxDb21tYW5kPkM6XFdpbmRvd3NcU3lzdGVtMzJcRGlzbS5leGU8L0NvbW1hbmQ+DQogICAgICA8QXJndW1lbnRzPi9PbmxpbmUgL0NsZWFudXAtSW1hZ2UgL1Jlc3RvcmVIZWFsdGg8L0FyZ3VtZW50cz4NCiAgICA8L0V4ZWM+DQogICAgPEV4ZWM+DQogICAgICA8Q29tbWFuZD5DOlxXaW5kb3dzXFN5c3RlbTMyXGNsZWFubWdyLmV4ZTwvQ29tbWFuZD4NCiAgICAgIDxBcmd1bWVudHM+L3NhZ2VydW46MjA0ODwvQXJndW1lbnRzPg0KICAgIDwvRXhlYz4NCiAgPC9BY3Rpb25zPg0KPC9UYXNrPg=="
-    Out-File -FilePath $tmp_file -InputObject ([Text.Encoding]::Utf8.GetString([Convert]::FromBase64String($b64_xml)))
-    $CUSTOM_LOG.Information("Exported decoded Base 64 xml data to temp file")
-    try {
-        Start-Process -FilePath "$env:windir\System32\schtasks.exe" -ArgumentList "/Create /ru System /XML `"$($tmp_file.FullName)`" /TN `"$TASK_FOLDER_NAME\$TASK_NAME`"" -Verb RunAs -Wait -WindowStyle Hidden
-        $CUSTOM_LOG.Success("Imported scheduled task")
-        Exit 0
-    }
-    catch {
-        $CUSTOM_LOG.Fail("Something went wrong, unable to import scheduled task from temp file")
-        $CUSTOM_LOG.Error($Error)
-        Exit 1
-    }
+    Exit 0
 
 }
 
