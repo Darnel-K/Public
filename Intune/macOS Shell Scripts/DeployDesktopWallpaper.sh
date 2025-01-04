@@ -1,9 +1,9 @@
 #!/bin/bash
 # #################################################################################################################### #
 # Filename: \Intune\macOS Shell Scripts\DeployDesktopWallpaper.sh                                                      #
-# Repository: Private                                                                                                  #
-# Created Date: Saturday, December 21st 2024, 7:32:20 PM                                                               #
-# Last Modified: Saturday, December 21st 2024, 9:09:49 PM                                                              #
+# Repository: Public                                                                                                   #
+# Created Date: Saturday, January 4th 2025, 9:40:30 PM                                                                 #
+# Last Modified: Saturday, January 4th 2025, 9:50:04 PM                                                                #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 # Github Org: https://github.com/ABYSS-ORG-UK/                                                                         #
