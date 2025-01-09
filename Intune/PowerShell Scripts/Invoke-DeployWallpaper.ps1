@@ -2,8 +2,8 @@
 # #################################################################################################################### #
 # Filename: \Intune\PowerShell Scripts\Invoke-DeployWallpaper.ps1                                                      #
 # Repository: Public                                                                                                   #
-# Created Date: Wednesday, January 8th 2025, 11:36:06 PM                                                               #
-# Last Modified: Thursday, January 9th 2025, 12:33:13 AM                                                               #
+# Created Date: Thursday, January 9th 2025, 8:53:55 AM                                                                 #
+# Last Modified: Thursday, January 9th 2025, 4:21:54 PM                                                                #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 #                                                                                                                      #
@@ -37,74 +37,121 @@
 
 function init {
 
-    $B64 = ""
-    $LOCKSCREEN_WALLPAPER_FILE = ''
-    $DESKTOP_WALLPAPER_FILE = ''
+    $B64 = "" # Base 64 encoded image string
+    $LOCKSCREEN_WALLPAPER_FILE_PATH = "" # Full local file path excluding filename for where on the executing machine you want to store the image file. e.g. 'C:\MDM'. Leave blank if you are not using a lockscreen image.
+    $LOCKSCREEN_WALLPAPER_FILENAME = "" # Filename for the image file. e.g. 'lockscreen.png'. Leave blank if you are not using a lockscreen image.
+    $DESKTOP_WALLPAPER_FILE_PATH = "" # Full local file path excluding filename for where on the executing machine you want to store the image file. e.g. 'C:\MDM'. Leave blank if you are not using a desktop image.
+    $DESKTOP_WALLPAPER_FILENAME = "" # Filename for the image file. e.g. 'desktop.png'. Leave blank if you are not using a lockscreen image.
 
     $REG_KEY_PATH, $STATUS_VALUE, $reg_data = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\PersonalizationCSP", "1", @()
+    $LOCKSCREEN_WALLPAPER_FULL_PATH, $DESKTOP_WALLPAPER_FULL_PATH = "$LOCKSCREEN_WALLPAPER_FILE_PATH\$LOCKSCREEN_WALLPAPER_FILENAME", "$DESKTOP_WALLPAPER_FILE_PATH\$DESKTOP_WALLPAPER_FILENAME"
 
-    if (!($LOCKSCREEN_WALLPAPER_FILE -eq "")) {
-        if ( !(Test-Path -Path $LOCKSCREEN_WALLPAPER_FILE) ) {
-            New-Item -ItemType Directory -Path $LOCKSCREEN_WALLPAPER_FILE
-        }
-        if (Test-Path -Path "$LOCKSCREEN_WALLPAPER_FILE") {
-            Remove-Item -Path "$LOCKSCREEN_WALLPAPER_FILE"
-        }
-        $bytes = [Convert]::FromBase64String($B64)
-        [IO.File]::WriteAllBytes("$LOCKSCREEN_WALLPAPER_FILE", $bytes)
-        if (Test-Path -Path "$LOCKSCREEN_WALLPAPER_FILE") {
-            Write-Host "File created successfully"
+    if ($LOCKSCREEN_WALLPAPER_FILE_PATH -ne "") {
+        $CUSTOM_LOG.Information("Checking if lockscreen wallpaper exists at path '$LOCKSCREEN_WALLPAPER_FULL_PATH'")
+        if (Test-Path -Path "$LOCKSCREEN_WALLPAPER_FULL_PATH") {
+            $CUSTOM_LOG.Information("Lockscreen wallpaper already exists, removing...")
+            try {
+                Remove-Item -Path "$LOCKSCREEN_WALLPAPER_FULL_PATH"
+                $CUSTOM_LOG.Success("Removed existing lockscreen wallpaper")
+            }
+            catch {
+                $CUSTOM_LOG.Fail("An error has occured removing the existing lockscreen wallpaper, will attempt to create lockscreen image anyway")
+                $CUSTOM_LOG.Error($Error[0])
+            }
         }
         else {
-            Write-Host "Failed to create file"
+            $CUSTOM_LOG.Information("File or Path does not exist, attempting to create path")
+            try {
+                New-Item -ItemType Directory -Path $LOCKSCREEN_WALLPAPER_FILE_PATH
+                $CUSTOM_LOG.Success("Created directory path")
+            }
+            catch {
+                $CUSTOM_LOG.Fail("An error has occured while creating the directory path, will attempt to create lockscreen image anyway")
+                $CUSTOM_LOG.Error($Error[0])
+            }
+
+        }
+        try {
+            $CUSTOM_LOG.Information("Attempting to decode Base64 encoded image")
+            $bytes = [Convert]::FromBase64String($B64)
+            $CUSTOM_LOG.Information("Attempting to create lockscreen image file")
+            [IO.File]::WriteAllBytes("$LOCKSCREEN_WALLPAPER_FULL_PATH", $bytes)
+            $CUSTOM_LOG.Success("Created lockscreen image")
+        }
+        catch {
+            $CUSTOM_LOG.Fail("An error has occured while decoding and creating the lockscreen image")
+            $CUSTOM_LOG.Error($Error[0])
             Exit 1
         }
+        $CUSTOM_LOG.Information("Generating registry data")
         $reg_data += [PSCustomObject]@{
             Path  = $REG_KEY_PATH
-            Name  = "LockScreenImagePath"
-            Value = $LOCKSCREEN_WALLPAPER_FILE
+            Key   = "LockScreenImagePath"
+            Value = $LOCKSCREEN_WALLPAPER_FULL_PATH
             Type  = "STRING"
         }
         $reg_data += [PSCustomObject]@{
             Path  = $REG_KEY_PATH
-            Name  = "LockScreenImageStatus"
+            Key   = "LockScreenImageStatus"
             Value = $STATUS_VALUE
             Type  = "DWORD"
         }
     }
 
-    if (!($DESKTOP_WALLPAPER_FILE -eq "")) {
-        if ( !(Test-Path -Path $DESKTOP_WALLPAPER_FILE)) {
-            New-Item -ItemType Directory -Path $DESKTOP_WALLPAPER_FILE
-        }
-        if (Test-Path -Path "$DESKTOP_WALLPAPER_FILE") {
-            Remove-Item -Path "$DESKTOP_WALLPAPER_FILE"
-        }
-        $bytes = [Convert]::FromBase64String($B64)
-        [IO.File]::WriteAllBytes("$DESKTOP_WALLPAPER_FILE", $bytes)
-        if (Test-Path -Path "$DESKTOP_WALLPAPER_FILE") {
-            Write-Host "File created successfully"
+    if ($DESKTOP_WALLPAPER_FILE_PATH -ne "") {
+        $CUSTOM_LOG.Information("Checking if desktop wallpaper exists at path '$DESKTOP_WALLPAPER_FULL_PATH'")
+        if (Test-Path -Path "$DESKTOP_WALLPAPER_FULL_PATH") {
+            $CUSTOM_LOG.Information("Desktop wallpaper already exists, removing...")
+            try {
+                Remove-Item -Path "$DESKTOP_WALLPAPER_FULL_PATH"
+                $CUSTOM_LOG.Success("Removed existing desktop wallpaper")
+            }
+            catch {
+                $CUSTOM_LOG.Fail("An error has occured removing the existing desktop wallpaper, will attempt to create desktop image anyway")
+                $CUSTOM_LOG.Error($Error[0])
+            }
         }
         else {
-            Write-Host "Failed to create file"
+            $CUSTOM_LOG.Information("File or Path does not exist, attempting to create path")
+            try {
+                New-Item -ItemType Directory -Path $DESKTOP_WALLPAPER_FILE_PATH
+                $CUSTOM_LOG.Success("Created directory path")
+            }
+            catch {
+                $CUSTOM_LOG.Fail("An error has occured while creating the directory path, will attempt to create desktop image anyway")
+                $CUSTOM_LOG.Error($Error[0])
+            }
+
+        }
+        try {
+            $CUSTOM_LOG.Information("Attempting to decode Base64 encoded image")
+            $bytes = [Convert]::FromBase64String($B64)
+            $CUSTOM_LOG.Information("Attempting to create desktop image file")
+            [IO.File]::WriteAllBytes("$DESKTOP_WALLPAPER_FULL_PATH", $bytes)
+            $CUSTOM_LOG.Success("Created desktop image")
+        }
+        catch {
+            $CUSTOM_LOG.Fail("An error has occured while decoding and creating the desktop image")
+            $CUSTOM_LOG.Error($Error[0])
             Exit 1
         }
+        $CUSTOM_LOG.Information("Generating registry data")
         $reg_data += [PSCustomObject]@{
             Path  = $REG_KEY_PATH
-            Name  = "DesktopImagePath"
-            Value = $DESKTOP_WALLPAPER_FILE
+            Key   = "DesktopImagePath"
+            Value = $DESKTOP_WALLPAPER_FULL_PATH
             Type  = "STRING"
         }
         $reg_data += [PSCustomObject]@{
             Path  = $REG_KEY_PATH
-            Name  = "DesktopImageStatus"
+            Key   = "DesktopImageStatus"
             Value = $STATUS_VALUE
             Type  = "DWORD"
         }
         $reg_data += [PSCustomObject]@{
             Path  = $REG_KEY_PATH
-            Name  = "DesktopImageUrl"
-            Value = $DESKTOP_WALLPAPER_FILE
+            Key   = "DesktopImageUrl"
+            Value = $DESKTOP_WALLPAPER_FULL_PATH
             Type  = "STRING"
         }
     }
@@ -145,7 +192,7 @@ function updateRegistry {
         [Parameter()]
         $data
     )
-    foreach ($i in ($reg_data | Sort-Object -Property Path)) {
+    foreach ($i in ($data | Sort-Object -Property Path)) {
         if (!(Test-Path -Path $i.Path)) {
             try {
                 New-Item -Path $i.Path -Force -ErrorAction Stop | Out-Null
@@ -191,7 +238,7 @@ function removeRegistry {
         [Parameter()]
         $data
     )
-    foreach ($i in ($reg_data | Sort-Object -Property Path, Key -Descending)) {
+    foreach ($i in ($data | Sort-Object -Property Path, Key -Descending)) {
         if (Test-Path -Path $i.Path) {
             if ($i.Key) {
                 try {
