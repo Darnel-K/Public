@@ -2,16 +2,15 @@
 # #################################################################################################################### #
 # Filename: \Intune\PowerShell Scripts\Set-FolderOptions.ps1                                                           #
 # Repository: Public                                                                                                   #
-# Created Date: Tuesday, October 1st 2024, 9:59:06 PM                                                                  #
-# Last Modified: Sunday, October 6th 2024, 11:21:33 PM                                                                 #
+# Created Date: Saturday, December 21st 2024, 6:43:29 PM                                                               #
+# Last Modified: Thursday, January 9th 2025, 12:18:32 AM                                                               #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
-# Github Org: https://github.com/ABYSS-ORG-UK/                                                                         #
 #                                                                                                                      #
 # This code complies with: https://gist.github.com/Darnel-K/8badda0cabdabb15359350f7af911c90                           #
 #                                                                                                                      #
 # License: GNU General Public License v3.0 only - https://www.gnu.org/licenses/gpl-3.0-standalone.html                 #
-# Copyright (c) 2024 Darnel Kumar                                                                                      #
+# Copyright (c) 2024 - 2025 Darnel Kumar                                                                               #
 #                                                                                                                      #
 # This program is free software: you can redistribute it and/or modify                                                 #
 # it under the terms of the GNU General Public License as published by                                                 #
@@ -39,6 +38,53 @@
     & .\Set-InitialFolderOptions.ps1
 #>
 
+# Script functions
+
+function init {
+    # Script initialisation function. This function contains the main code and calls to other functions.
+    # This function is called automatically at the bottom of the script
+    $SCRIPT_EXEC_MODE = "Update" # Update or Delete. Tells the script to either update the registry or delete the keys
+    $REG_DATA = @(
+        [PSCustomObject]@{
+            Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
+            Key   = "Hidden"
+            Value = "1"
+            Type  = "DWord"
+        }
+        [PSCustomObject]@{
+            Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
+            Key   = "HideDrivesWithNoMedia"
+            Value = "0"
+            Type  = "DWord"
+        }
+        [PSCustomObject]@{
+            Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
+            Key   = "ShowEncryptCompressedColor"
+            Value = "1"
+            Type  = "DWord"
+        }
+        [PSCustomObject]@{
+            Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
+            Key   = "HideFileExt"
+            Value = "0"
+            Type  = "DWord"
+        }
+        [PSCustomObject]@{
+            Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\CabinetState"
+            Key   = "FullPath"
+            Value = "1"
+            Type  = "DWord"
+        }
+    )
+    if (beginRegistryUpdate -data $REG_DATA -mode $SCRIPT_EXEC_MODE) {
+        Exit 0
+    }
+    else {
+        Exit 1
+    }
+
+}
+
 #################################
 #                               #
 #   REQUIRED SCRIPT VARIABLES   #
@@ -48,40 +94,7 @@
 # DO NOT REMOVE THESE VARIABLES
 # DO NOT LEAVE THESE VARIABLES BLANK
 
-$SCRIPT_NAME = "Set-FolderOptions"
-$SCRIPT_EXEC_MODE = "Update" # Update or Delete. Tells the script to either update the registry or delete the keys
-$REG_DATA = @(
-    [PSCustomObject]@{
-        Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
-        Key  = "Hidden"
-        Value = "1"
-        Type  = "DWord"
-    }
-    [PSCustomObject]@{
-        Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
-        Key  = "HideDrivesWithNoMedia"
-        Value = "0"
-        Type  = "DWord"
-    }
-    [PSCustomObject]@{
-        Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
-        Key  = "ShowEncryptCompressedColor"
-        Value = "1"
-        Type  = "DWord"
-    }
-    [PSCustomObject]@{
-        Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
-        Key  = "HideFileExt"
-        Value = "0"
-        Type  = "DWord"
-    }
-    [PSCustomObject]@{
-        Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\CabinetState"
-        Key  = "FullPath"
-        Value = "1"
-        Type  = "DWord"
-    }
-)
+$SCRIPT_NAME = "Set-FolderOptions" # This is used in the window title and the event log entries.
 
 ################################################
 #                                              #
@@ -92,7 +105,11 @@ $REG_DATA = @(
 # Script functions - DO NOT CHANGE!
 
 function updateRegistry {
-    foreach ($i in ($REG_DATA | Sort-Object -Property Path)) {
+    param (
+        [Parameter()]
+        $data
+    )
+    foreach ($i in ($reg_data | Sort-Object -Property Path)) {
         if (!(Test-Path -Path $i.Path)) {
             try {
                 New-Item -Path $i.Path -Force -ErrorAction Stop | Out-Null
@@ -101,7 +118,7 @@ function updateRegistry {
             catch {
                 $CUSTOM_LOG.Fail("Failed to create registry path: $($i.Path)")
                 $CUSTOM_LOG.Error($Error[0])
-                Exit 1
+                return $false
             }
         }
         if ($i.Key) {
@@ -113,7 +130,7 @@ function updateRegistry {
                 catch {
                     $CUSTOM_LOG.Fail("Failed to make the following registry edit:`n - Key: $($i.Path)`n - Property: $($i.Key)`n - Value: $($i.Value)`n - Type: $($i.Type)")
                     $CUSTOM_LOG.Error($Error[0])
-                    Exit 1
+                    return $false
                 }
             }
             else {
@@ -124,17 +141,21 @@ function updateRegistry {
                 catch {
                     $CUSTOM_LOG.Fail("Failed to make the following registry edit:`n - Key: $($i.Path)`n - Property: $($i.Key)`n - Value: $($i.Value)`n - Type: $($i.Type)")
                     $CUSTOM_LOG.Error($Error[0])
-                    Exit 1
+                    return $false
                 }
             }
         }
     }
     $CUSTOM_LOG.Success("Completed registry update successfully.")
-    Exit 0
+    return $true
 }
 
 function removeRegistry {
-    foreach ($i in ($REG_DATA | Sort-Object -Property Path, Key -Descending)) {
+    param (
+        [Parameter()]
+        $data
+    )
+    foreach ($i in ($reg_data | Sort-Object -Property Path, Key -Descending)) {
         if (Test-Path -Path $i.Path) {
             if ($i.Key) {
                 try {
@@ -144,7 +165,7 @@ function removeRegistry {
                 catch {
                     $CUSTOM_LOG.Fail("Failed to remove registy property: $($i.Key) at path: $($i.Path)")
                     $CUSTOM_LOG.Error($Error[0])
-                    Exit 1
+                    return $false
                 }
             }
             else {
@@ -155,7 +176,7 @@ function removeRegistry {
                 catch {
                     $CUSTOM_LOG.Fail("Failed to remove registy path: $($i.Path)")
                     $CUSTOM_LOG.Error($Error[0])
-                    Exit 1
+                    return $false
                 }
             }
         }
@@ -164,14 +185,22 @@ function removeRegistry {
         }
     }
     $CUSTOM_LOG.Success("Completed registry update successfully.")
-    Exit 0
+    return $true
 }
 
-function init {
-    switch ($SCRIPT_EXEC_MODE) {
-        "Update" { updateRegistry }
-        "Delete" { removeRegistry }
-        Default { updateRegistry }
+function beginRegistryUpdate {
+    param (
+        [Parameter()]
+        $data,
+        [Parameter()]
+        [ValidateSet("Update", "Delete")]
+        [string]
+        $mode
+    )
+    switch ($mode) {
+        "Update" { return updateRegistry -data $data }
+        "Delete" { return removeRegistry -data $data }
+        Default { return updateRegistry -data $data }
     }
 }
 
