@@ -3,7 +3,7 @@
 # Filename: \Intune\macOS Shell Scripts\DeployDesktopWallpaper.sh                                                      #
 # Repository: Public                                                                                                   #
 # Created Date: Saturday, January 4th 2025, 9:40:30 PM                                                                 #
-# Last Modified: Saturday, January 4th 2025, 9:50:04 PM                                                                #
+# Last Modified: Friday, January 10th 2025, 10:26:56 PM                                                                #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 # Github Org: https://github.com/ABYSS-ORG-UK/                                                                         #
@@ -38,4 +38,4 @@ mkdir -pv "${WALLPAPER_PATH}"
 
 base64 -d <<< "$B64" > "${WALLPAPER_PATH}/${WALLPAPER_FILENAME}"
 chmod -Rvv 644 "${WALLPAPER_PATH}/${WALLPAPER_FILENAME}"
-chown -Rvv root:root "${WALLPAPER_PATH}/${WALLPAPER_FILENAME}"
+chown -Rvv root:wheel "${WALLPAPER_PATH}/${WALLPAPER_FILENAME}"
