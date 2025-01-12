@@ -2,16 +2,15 @@
 # #################################################################################################################### #
 # Filename: \Intune\PowerShell Scripts\Enable-WindowsPhotoViewer.ps1                                                   #
 # Repository: Public                                                                                                   #
-# Created Date: Tuesday, October 1st 2024, 9:59:06 PM                                                                  #
-# Last Modified: Sunday, October 6th 2024, 11:21:33 PM                                                                 #
+# Created Date: Saturday, December 21st 2024, 6:43:29 PM                                                               #
+# Last Modified: Sunday, January 12th 2025, 10:36:16 PM                                                                #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
-# Github Org: https://github.com/ABYSS-ORG-UK/                                                                         #
 #                                                                                                                      #
 # This code complies with: https://gist.github.com/Darnel-K/8badda0cabdabb15359350f7af911c90                           #
 #                                                                                                                      #
 # License: GNU General Public License v3.0 only - https://www.gnu.org/licenses/gpl-3.0-standalone.html                 #
-# Copyright (c) 2024 Darnel Kumar                                                                                      #
+# Copyright (c) 2024 - 2025 Darnel Kumar                                                                               #
 #                                                                                                                      #
 # This program is free software: you can redistribute it and/or modify                                                 #
 # it under the terms of the GNU General Public License as published by                                                 #
@@ -34,6 +33,272 @@
     & .\Enable-WindowsPhotoViewer.ps1
 #>
 
+# Script functions
+
+function init {
+    $SCRIPT_EXEC_MODE = "Update" # Update or Delete. Tells the script to either update the registry or delete the keys
+    $REG_DATA = @(
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
+            Key   = ".bmp"
+            Value = "PhotoViewer.FileAssoc.BITMAP"
+            Type  = "String"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
+            Key   = ".dib"
+            Value = "PhotoViewer.FileAssoc.BITMAP"
+            Type  = "String"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
+            Key   = ".jpg"
+            Value = "PhotoViewer.FileAssoc.JPEG"
+            Type  = "String"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
+            Key   = ".jpe"
+            Value = "PhotoViewer.FileAssoc.JPEG"
+            Type  = "String"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
+            Key   = ".jpeg"
+            Value = "PhotoViewer.FileAssoc.JPEG"
+            Type  = "String"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
+            Key   = ".jxr"
+            Value = "PhotoViewer.FileAssoc.JPEG"
+            Type  = "String"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
+            Key   = ".jfif"
+            Value = "PhotoViewer.FileAssoc.JFIF"
+            Type  = "String"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
+            Key   = ".wdp"
+            Value = "PhotoViewer.FileAssoc.WDP"
+            Type  = "String"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
+            Key   = ".png"
+            Value = "PhotoViewer.FileAssoc.PNG"
+            Type  = "String"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
+            Key   = ".gif"
+            Value = "PhotoViewer.FileAssoc.TIFF"
+            Type  = "String"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
+            Key   = ".tiff"
+            Value = "PhotoViewer.FileAssoc.TIFF"
+            Type  = "String"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
+            Key   = ".tif"
+            Value = "PhotoViewer.FileAssoc.TIFF"
+            Type  = "String"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.BITMAP"
+            Key   = "ImageOptionFlags"
+            Value = "00000001"
+            Type  = "DWord"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.BITMAP"
+            Key   = "FriendlyTypeName"
+            Value = "@%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll,-3056"
+            Type  = "ExpandString"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.BITMAP\DefaultIcon"
+            Key   = "(Default)"
+            Value = "%SystemRoot%\System32\imageres.dll,-72"
+            Type  = "String"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.BITMAP\shell\open\command"
+            Key   = "(Default)"
+            Value = "%SystemRoot%\System32\rundll32.exe `"%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll`", ImageView_Fullscreen %1"
+            Type  = "ExpandString"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.BITMAP\shell\open\DropTarget"
+            Key   = "CLSID"
+            Value = "{FFE2A43C-56B9-4bf5-9A79-CC6D4285608A}"
+            Type  = "String"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.JFIF"
+            Key   = "EditFlags"
+            Value = "00010000"
+            Type  = "DWord"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.JFIF"
+            Key   = "ImageOptionFlags"
+            Value = "00000001"
+            Type  = "DWord"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.JFIF"
+            Key   = "FriendlyTypeName"
+            Value = "@%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll,-3055"
+            Type  = "ExpandString"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.JFIF\DefaultIcon"
+            Key   = "(Default)"
+            Value = "%SystemRoot%\System32\imageres.dll,-72"
+            Type  = "String"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.JFIF\shell\open"
+            Key   = "MuiVerb"
+            Value = "@%ProgramFiles%\Windows Photo Viewer\photoviewer.dll,-3043"
+            Type  = "ExpandString"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.JFIF\shell\open\command"
+            Key   = "(Default)"
+            Value = "%SystemRoot%\System32\rundll32.exe `"%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll`", ImageView_Fullscreen %1"
+            Type  = "ExpandString"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.JFIF\shell\open\DropTarget"
+            Key   = "CLSID"
+            Value = "{FFE2A43C-56B9-4bf5-9A79-CC6D4285608A}"
+            Type  = "String"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.JPEG"
+            Key   = "EditFlags"
+            Value = "00010000"
+            Type  = "DWord"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.JPEG"
+            Key   = "ImageOptionFlags"
+            Value = "00000001"
+            Type  = "DWord"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.JPEG"
+            Key   = "FriendlyTypeName"
+            Value = "@%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll,-3055"
+            Type  = "ExpandString"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.JPEG\DefaultIcon"
+            Key   = "(Default)"
+            Value = "%SystemRoot%\System32\imageres.dll,-72"
+            Type  = "String"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.JPEG\shell\open"
+            Key   = "MuiVerb"
+            Value = "@%ProgramFiles%\Windows Photo Viewer\photoviewer.dll,-3043"
+            Type  = "ExpandString"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.JPEG\shell\open\command"
+            Key   = "(Default)"
+            Value = "%SystemRoot%\System32\rundll32.exe `"%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll`", ImageView_Fullscreen %1"
+            Type  = "String"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.JPEG\shell\open\DropTarget"
+            Key   = "CLSID"
+            Value = "{FFE2A43C-56B9-4bf5-9A79-CC6D4285608A}"
+            Type  = "String"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.PNG"
+            Key   = "ImageOptionFlags"
+            Value = "00000001"
+            Type  = "DWord"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.PNG"
+            Key   = "FriendlyTypeName"
+            Value = "@%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll,-3057"
+            Type  = "ExpandString"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.PNG\DefaultIcon"
+            Key   = "(Default)"
+            Value = "%SystemRoot%\System32\imageres.dll,-71"
+            Type  = "String"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.PNG\shell\open\command"
+            Key   = "(Default)"
+            Value = "%SystemRoot%\System32\rundll32.exe `"%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll`", ImageView_Fullscreen %1"
+            Type  = "ExpandString"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.PNG\shell\open\DropTarget"
+            Key   = "CLSID"
+            Value = "{FFE2A43C-56B9-4bf5-9A79-CC6D4285608A}"
+            Type  = "String"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.WDP"
+            Key   = "EditFlags"
+            Value = "00010000"
+            Type  = "DWord"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.WDP"
+            Key   = "ImageOptionFlags"
+            Value = "00000001"
+            Type  = "DWord"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.WDP\DefaultIcon"
+            Key   = "(Default)"
+            Value = "%SystemRoot%\System32\wmphoto.dll,-400"
+            Type  = "String"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.WDP\shell\open"
+            Key   = "MuiVerb"
+            Value = "@%ProgramFiles%\Windows Photo Viewer\photoviewer.dll,-3043"
+            Type  = "ExpandString"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.WDP\shell\open\command"
+            Key   = "(Default)"
+            Value = "%SystemRoot%\System32\rundll32.exe `"%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll`", ImageView_Fullscreen %1"
+            Type  = "ExpandString"
+        }
+        [PSCustomObject]@{
+            Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.WDP\shell\open\DropTarget"
+            Key   = "CLSID"
+            Value = "{FFE2A43C-56B9-4bf5-9A79-CC6D4285608A}"
+            Type  = "String"
+        }
+    )
+    if (-not (beginRegistryUpdate -data $REG_DATA -mode $SCRIPT_EXEC_MODE)) {
+        $CUSTOM_LOG.Fail("Unable to update registry data")
+        $CUSTOM_LOG.Error($Error)
+        Exit 1
+    }
+    Exit 0
+}
+
 #################################
 #                               #
 #   REQUIRED SCRIPT VARIABLES   #
@@ -44,261 +309,6 @@
 # DO NOT LEAVE THESE VARIABLES BLANK
 
 $SCRIPT_NAME = "Enable-WindowsPhotoViewer"
-$SCRIPT_EXEC_MODE = "Update" # Update or Delete. Tells the script to either update the registry or delete the keys
-$REG_DATA = @(
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
-        Key  = ".bmp"
-        Value = "PhotoViewer.FileAssoc.BITMAP"
-        Type  = "String"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
-        Key  = ".dib"
-        Value = "PhotoViewer.FileAssoc.BITMAP"
-        Type  = "String"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
-        Key  = ".jpg"
-        Value = "PhotoViewer.FileAssoc.JPEG"
-        Type  = "String"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
-        Key  = ".jpe"
-        Value = "PhotoViewer.FileAssoc.JPEG"
-        Type  = "String"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
-        Key  = ".jpeg"
-        Value = "PhotoViewer.FileAssoc.JPEG"
-        Type  = "String"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
-        Key  = ".jxr"
-        Value = "PhotoViewer.FileAssoc.JPEG"
-        Type  = "String"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
-        Key  = ".jfif"
-        Value = "PhotoViewer.FileAssoc.JFIF"
-        Type  = "String"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
-        Key  = ".wdp"
-        Value = "PhotoViewer.FileAssoc.WDP"
-        Type  = "String"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
-        Key  = ".png"
-        Value = "PhotoViewer.FileAssoc.PNG"
-        Type  = "String"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
-        Key  = ".gif"
-        Value = "PhotoViewer.FileAssoc.TIFF"
-        Type  = "String"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
-        Key  = ".tiff"
-        Value = "PhotoViewer.FileAssoc.TIFF"
-        Type  = "String"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Microsoft\Windows Photo Viewer\Capabilities\FileAssociations"
-        Key  = ".tif"
-        Value = "PhotoViewer.FileAssoc.TIFF"
-        Type  = "String"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.BITMAP"
-        Key  = "ImageOptionFlags"
-        Value = "00000001"
-        Type  = "DWord"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.BITMAP"
-        Key  = "FriendlyTypeName"
-        Value = "@%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll,-3056"
-        Type  = "ExpandString"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.BITMAP\DefaultIcon"
-        Key  = "(Default)"
-        Value = "%SystemRoot%\System32\imageres.dll,-72"
-        Type  = "String"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.BITMAP\shell\open\command"
-        Key  = "(Default)"
-        Value = "%SystemRoot%\System32\rundll32.exe `"%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll`", ImageView_Fullscreen %1"
-        Type  = "ExpandString"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.BITMAP\shell\open\DropTarget"
-        Key  = "CLSID"
-        Value = "{FFE2A43C-56B9-4bf5-9A79-CC6D4285608A}"
-        Type  = "String"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.JFIF"
-        Key  = "EditFlags"
-        Value = "00010000"
-        Type  = "DWord"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.JFIF"
-        Key  = "ImageOptionFlags"
-        Value = "00000001"
-        Type  = "DWord"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.JFIF"
-        Key  = "FriendlyTypeName"
-        Value = "@%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll,-3055"
-        Type  = "ExpandString"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.JFIF\DefaultIcon"
-        Key  = "(Default)"
-        Value = "%SystemRoot%\System32\imageres.dll,-72"
-        Type  = "String"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.JFIF\shell\open"
-        Key  = "MuiVerb"
-        Value = "@%ProgramFiles%\Windows Photo Viewer\photoviewer.dll,-3043"
-        Type  = "ExpandString"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.JFIF\shell\open\command"
-        Key  = "(Default)"
-        Value = "%SystemRoot%\System32\rundll32.exe `"%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll`", ImageView_Fullscreen %1"
-        Type  = "ExpandString"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.JFIF\shell\open\DropTarget"
-        Key  = "CLSID"
-        Value = "{FFE2A43C-56B9-4bf5-9A79-CC6D4285608A}"
-        Type  = "String"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.JPEG"
-        Key  = "EditFlags"
-        Value = "00010000"
-        Type  = "DWord"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.JPEG"
-        Key  = "ImageOptionFlags"
-        Value = "00000001"
-        Type  = "DWord"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.JPEG"
-        Key  = "FriendlyTypeName"
-        Value = "@%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll,-3055"
-        Type  = "ExpandString"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.JPEG\DefaultIcon"
-        Key  = "(Default)"
-        Value = "%SystemRoot%\System32\imageres.dll,-72"
-        Type  = "String"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.JPEG\shell\open"
-        Key  = "MuiVerb"
-        Value = "@%ProgramFiles%\Windows Photo Viewer\photoviewer.dll,-3043"
-        Type  = "ExpandString"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.JPEG\shell\open\command"
-        Key  = "(Default)"
-        Value = "%SystemRoot%\System32\rundll32.exe `"%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll`", ImageView_Fullscreen %1"
-        Type  = "String"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.JPEG\shell\open\DropTarget"
-        Key  = "CLSID"
-        Value = "{FFE2A43C-56B9-4bf5-9A79-CC6D4285608A}"
-        Type  = "String"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.PNG"
-        Key  = "ImageOptionFlags"
-        Value = "00000001"
-        Type  = "DWord"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.PNG"
-        Key  = "FriendlyTypeName"
-        Value = "@%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll,-3057"
-        Type  = "ExpandString"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.PNG\DefaultIcon"
-        Key  = "(Default)"
-        Value = "%SystemRoot%\System32\imageres.dll,-71"
-        Type  = "String"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.PNG\shell\open\command"
-        Key  = "(Default)"
-        Value = "%SystemRoot%\System32\rundll32.exe `"%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll`", ImageView_Fullscreen %1"
-        Type  = "ExpandString"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.PNG\shell\open\DropTarget"
-        Key  = "CLSID"
-        Value = "{FFE2A43C-56B9-4bf5-9A79-CC6D4285608A}"
-        Type  = "String"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.WDP"
-        Key  = "EditFlags"
-        Value = "00010000"
-        Type  = "DWord"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.WDP"
-        Key  = "ImageOptionFlags"
-        Value = "00000001"
-        Type  = "DWord"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.WDP\DefaultIcon"
-        Key  = "(Default)"
-        Value = "%SystemRoot%\System32\wmphoto.dll,-400"
-        Type  = "String"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.WDP\shell\open"
-        Key  = "MuiVerb"
-        Value = "@%ProgramFiles%\Windows Photo Viewer\photoviewer.dll,-3043"
-        Type  = "ExpandString"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.WDP\shell\open\command"
-        Key  = "(Default)"
-        Value = "%SystemRoot%\System32\rundll32.exe `"%ProgramFiles%\Windows Photo Viewer\PhotoViewer.dll`", ImageView_Fullscreen %1"
-        Type  = "ExpandString"
-    }
-    [PSCustomObject]@{
-        Path  = "HKLM:\SOFTWARE\Classes\PhotoViewer.FileAssoc.WDP\shell\open\DropTarget"
-        Key  = "CLSID"
-        Value = "{FFE2A43C-56B9-4bf5-9A79-CC6D4285608A}"
-        Type  = "String"
-    }
-)
 
 ################################################
 #                                              #
@@ -309,7 +319,11 @@ $REG_DATA = @(
 # Script functions - DO NOT CHANGE!
 
 function updateRegistry {
-    foreach ($i in ($REG_DATA | Sort-Object -Property Path)) {
+    param (
+        [Parameter()]
+        $data
+    )
+    foreach ($i in ($data | Sort-Object -Property Path)) {
         if (!(Test-Path -Path $i.Path)) {
             try {
                 New-Item -Path $i.Path -Force -ErrorAction Stop | Out-Null
@@ -318,7 +332,7 @@ function updateRegistry {
             catch {
                 $CUSTOM_LOG.Fail("Failed to create registry path: $($i.Path)")
                 $CUSTOM_LOG.Error($Error[0])
-                Exit 1
+                return $false
             }
         }
         if ($i.Key) {
@@ -330,7 +344,7 @@ function updateRegistry {
                 catch {
                     $CUSTOM_LOG.Fail("Failed to make the following registry edit:`n - Key: $($i.Path)`n - Property: $($i.Key)`n - Value: $($i.Value)`n - Type: $($i.Type)")
                     $CUSTOM_LOG.Error($Error[0])
-                    Exit 1
+                    return $false
                 }
             }
             else {
@@ -341,17 +355,21 @@ function updateRegistry {
                 catch {
                     $CUSTOM_LOG.Fail("Failed to make the following registry edit:`n - Key: $($i.Path)`n - Property: $($i.Key)`n - Value: $($i.Value)`n - Type: $($i.Type)")
                     $CUSTOM_LOG.Error($Error[0])
-                    Exit 1
+                    return $false
                 }
             }
         }
     }
     $CUSTOM_LOG.Success("Completed registry update successfully.")
-    Exit 0
+    return $true
 }
 
 function removeRegistry {
-    foreach ($i in ($REG_DATA | Sort-Object -Property Path, Key -Descending)) {
+    param (
+        [Parameter()]
+        $data
+    )
+    foreach ($i in ($data | Sort-Object -Property Path, Key -Descending)) {
         if (Test-Path -Path $i.Path) {
             if ($i.Key) {
                 try {
@@ -361,7 +379,7 @@ function removeRegistry {
                 catch {
                     $CUSTOM_LOG.Fail("Failed to remove registy property: $($i.Key) at path: $($i.Path)")
                     $CUSTOM_LOG.Error($Error[0])
-                    Exit 1
+                    return $false
                 }
             }
             else {
@@ -372,7 +390,7 @@ function removeRegistry {
                 catch {
                     $CUSTOM_LOG.Fail("Failed to remove registy path: $($i.Path)")
                     $CUSTOM_LOG.Error($Error[0])
-                    Exit 1
+                    return $false
                 }
             }
         }
@@ -381,14 +399,22 @@ function removeRegistry {
         }
     }
     $CUSTOM_LOG.Success("Completed registry update successfully.")
-    Exit 0
+    return $true
 }
 
-function init {
-    switch ($SCRIPT_EXEC_MODE) {
-        "Update" { updateRegistry }
-        "Delete" { removeRegistry }
-        Default { updateRegistry }
+function beginRegistryUpdate {
+    param (
+        [Parameter()]
+        $data,
+        [Parameter()]
+        [ValidateSet("Update", "Delete")]
+        [string]
+        $mode
+    )
+    switch ($mode) {
+        "Update" { return updateRegistry -data $data }
+        "Delete" { return removeRegistry -data $data }
+        Default { return updateRegistry -data $data }
     }
 }
 
@@ -622,4 +648,5 @@ class CustomLog {
 Clear-Host
 sig
 checkRunIn64BitPowershell
+$CUSTOM_LOG.Information("Script PID: $PID")
 init
