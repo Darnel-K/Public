@@ -3,14 +3,14 @@
 # Filename: \Intune\PowerShell Scripts\Set-UserLocale(UK).ps1                                                          #
 # Repository: Public                                                                                                   #
 # Created Date: Saturday, January 11th 2025, 7:53:13 PM                                                                #
-# Last Modified: Saturday, January 11th 2025, 8:12:22 PM                                                               #
+# Last Modified: Sunday, January 12th 2025, 10:37:54 PM                                                                #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 #                                                                                                                      #
 # This code complies with: https://gist.github.com/Darnel-K/8badda0cabdabb15359350f7af911c90                           #
 #                                                                                                                      #
 # License: GNU General Public License v3.0 only - https://www.gnu.org/licenses/gpl-3.0-standalone.html                 #
-# Copyright (c) 2024 - 2025 Darnel Kumar                                                                               #
+# Copyright (c) 2025 Darnel Kumar                                                                                      #
 #                                                                                                                      #
 # This program is free software: you can redistribute it and/or modify                                                 #
 # it under the terms of the GNU General Public License as published by                                                 #
