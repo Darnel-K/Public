@@ -3,7 +3,7 @@
 # Filename: \Intune\Remediation Scripts\Docker-Users Local Group Membership\Detect-DockerUsersLocalGroupMembership.ps1 #
 # Repository: Public                                                                                                   #
 # Created Date: Saturday, January 4th 2025, 9:53:31 PM                                                                 #
-# Last Modified: Saturday, January 4th 2025, 9:55:26 PM                                                                #
+# Last Modified: Sunday, January 12th 2025, 10:48:36 PM                                                                #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 #                                                                                                                      #
@@ -342,4 +342,5 @@ class CustomLog {
 Clear-Host
 sig
 checkRunIn64BitPowershell
+$CUSTOM_LOG.Information("Script PID: $PID")
 init
