@@ -2,16 +2,15 @@
 # #################################################################################################################### #
 # Filename: \Intune\PowerShell Scripts\Set-WindowsThemeAndAccent.ps1                                                   #
 # Repository: Public                                                                                                   #
-# Created Date: Tuesday, October 1st 2024, 9:59:06 PM                                                                  #
-# Last Modified: Sunday, October 6th 2024, 11:21:33 PM                                                                 #
+# Created Date: Saturday, December 21st 2024, 6:43:29 PM                                                               #
+# Last Modified: Sunday, January 12th 2025, 10:38:11 PM                                                                #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
-# Github Org: https://github.com/ABYSS-ORG-UK/                                                                         #
 #                                                                                                                      #
 # This code complies with: https://gist.github.com/Darnel-K/8badda0cabdabb15359350f7af911c90                           #
 #                                                                                                                      #
 # License: GNU General Public License v3.0 only - https://www.gnu.org/licenses/gpl-3.0-standalone.html                 #
-# Copyright (c) 2024 Darnel Kumar                                                                                      #
+# Copyright (c) 2024 - 2025 Darnel Kumar                                                                               #
 #                                                                                                                      #
 # This program is free software: you can redistribute it and/or modify                                                 #
 # it under the terms of the GNU General Public License as published by                                                 #
@@ -36,6 +35,73 @@
     & .\Set-WindowsThemeAndAccent.ps1
 #>
 
+# Script functions
+
+function init {
+    $SCRIPT_EXEC_MODE = "Update" # Update or Delete. Tells the script to either update the registry or delete the keys
+    $REG_DATA = @(
+        [PSCustomObject]@{
+            Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" # Registry key path
+            Key   = "SystemUsesLightTheme" # Registry property name
+            Value = "0" # Registry property value
+            Type  = "DWord" # Binary, DWord, ExpandString, MultiString, String or QWord
+        }
+        [PSCustomObject]@{
+            Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" # Registry key path
+            Key   = "AppsUseLightTheme" # Registry property name
+            Value = "0" # Registry property value
+            Type  = "DWord" # Binary, DWord, ExpandString, MultiString, String or QWord
+        }
+        [PSCustomObject]@{
+            Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Accent" # Registry key path
+            Key   = "AccentPalette" # Registry property name
+            Value = [byte[]](("FB 9D 8B 00 F4 67 62 00 EF 27 33 00 E8 11 23 00 D2 0E 1E 00 9E 09 12 00 6F 03 06 00 69 79 7E 00").Split(' ') | ForEach-Object { "0x$_" }) # Registry property value
+            Type  = "Binary" # Binary, DWord, ExpandString, MultiString, String or QWord
+        }
+        [PSCustomObject]@{
+            Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Accent" # Registry key path
+            Key   = "StartColorMenu" # Registry property name
+            Value = "4280159954" # Registry property value
+            Type  = "DWord" # Binary, DWord, ExpandString, MultiString, String or QWord
+        }
+        [PSCustomObject]@{
+            Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Accent" # Registry key path
+            Key   = "AccentColorMenu" # Registry property name
+            Value = "4280488424" # Registry property value
+            Type  = "DWord" # Binary, DWord, ExpandString, MultiString, String or QWord
+        }
+        [PSCustomObject]@{
+            Path  = "HKCU:\Software\Microsoft\Windows\DWM" # Registry key path
+            Key   = "AccentColor" # Registry property name
+            Value = "4280488424" # Registry property value
+            Type  = "" # Binary, DWord, ExpandString, MultiString, String or QWord
+        }
+        [PSCustomObject]@{
+            Path  = "HKCU:\Software\Microsoft\Windows\DWM" # Registry key path
+            Key   = "ColorizationAfterglow" # Registry property name
+            Value = "3303543075" # Registry property value
+            Type  = "" # Binary, DWord, ExpandString, MultiString, String or QWord
+        }
+        [PSCustomObject]@{
+            Path  = "HKCU:\Software\Microsoft\Windows\DWM" # Registry key path
+            Key   = "ColorizationColor" # Registry property name
+            Value = "3303543075" # Registry property value
+            Type  = "" # Binary, DWord, ExpandString, MultiString, String or QWord
+        }
+        [PSCustomObject]@{
+            Path  = "HKCU:\Software\Microsoft\Windows\DWM" # Registry key path
+            Key   = "ColorPrevalence" # Registry property name
+            Value = "1" # Registry property value
+            Type  = "DWord" # Binary, DWord, ExpandString, MultiString, String or QWord
+        }
+    )
+    if (-not (beginRegistryUpdate -data $REG_DATA -mode $SCRIPT_EXEC_MODE)) {
+        $CUSTOM_LOG.Fail("Unable to update registry data")
+        $CUSTOM_LOG.Error($Error)
+        Exit 1
+    }
+}
+
 #################################
 #                               #
 #   REQUIRED SCRIPT VARIABLES   #
@@ -46,63 +112,6 @@
 # DO NOT LEAVE THESE VARIABLES BLANK
 
 $SCRIPT_NAME = "Set-WindowsThemeAndAccent"
-$SCRIPT_EXEC_MODE = "Update" # Update or Delete. Tells the script to either update the registry or delete the keys
-$REG_DATA = @(
-    [PSCustomObject]@{
-        Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" # Registry key path
-        Key  = "SystemUsesLightTheme" # Registry property name
-        Value = "0" # Registry property value
-        Type  = "DWord" # Binary, DWord, ExpandString, MultiString, String or QWord
-    }
-    [PSCustomObject]@{
-        Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" # Registry key path
-        Key  = "AppsUseLightTheme" # Registry property name
-        Value = "0" # Registry property value
-        Type  = "DWord" # Binary, DWord, ExpandString, MultiString, String or QWord
-    }
-    [PSCustomObject]@{
-        Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Accent" # Registry key path
-        Key  = "AccentPalette" # Registry property name
-        Value = [byte[]](("FB 9D 8B 00 F4 67 62 00 EF 27 33 00 E8 11 23 00 D2 0E 1E 00 9E 09 12 00 6F 03 06 00 69 79 7E 00").Split(' ') | ForEach-Object { "0x$_" }) # Registry property value
-        Type  = "Binary" # Binary, DWord, ExpandString, MultiString, String or QWord
-    }
-    [PSCustomObject]@{
-        Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Accent" # Registry key path
-        Key  = "StartColorMenu" # Registry property name
-        Value = "4280159954" # Registry property value
-        Type  = "DWord" # Binary, DWord, ExpandString, MultiString, String or QWord
-    }
-    [PSCustomObject]@{
-        Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Accent" # Registry key path
-        Key  = "AccentColorMenu" # Registry property name
-        Value = "4280488424" # Registry property value
-        Type  = "DWord" # Binary, DWord, ExpandString, MultiString, String or QWord
-    }
-    [PSCustomObject]@{
-        Path  = "HKCU:\Software\Microsoft\Windows\DWM" # Registry key path
-        Key  = "AccentColor" # Registry property name
-        Value = "4280488424" # Registry property value
-        Type  = "" # Binary, DWord, ExpandString, MultiString, String or QWord
-    }
-    [PSCustomObject]@{
-        Path  = "HKCU:\Software\Microsoft\Windows\DWM" # Registry key path
-        Key  = "ColorizationAfterglow" # Registry property name
-        Value = "3303543075" # Registry property value
-        Type  = "" # Binary, DWord, ExpandString, MultiString, String or QWord
-    }
-    [PSCustomObject]@{
-        Path  = "HKCU:\Software\Microsoft\Windows\DWM" # Registry key path
-        Key  = "ColorizationColor" # Registry property name
-        Value = "3303543075" # Registry property value
-        Type  = "" # Binary, DWord, ExpandString, MultiString, String or QWord
-    }
-    [PSCustomObject]@{
-        Path  = "HKCU:\Software\Microsoft\Windows\DWM" # Registry key path
-        Key  = "ColorPrevalence" # Registry property name
-        Value = "1" # Registry property value
-        Type  = "DWord" # Binary, DWord, ExpandString, MultiString, String or QWord
-    }
-)
 
 ################################################
 #                                              #
@@ -113,7 +122,11 @@ $REG_DATA = @(
 # Script functions - DO NOT CHANGE!
 
 function updateRegistry {
-    foreach ($i in ($REG_DATA | Sort-Object -Property Path)) {
+    param (
+        [Parameter()]
+        $data
+    )
+    foreach ($i in ($data | Sort-Object -Property Path)) {
         if (!(Test-Path -Path $i.Path)) {
             try {
                 New-Item -Path $i.Path -Force -ErrorAction Stop | Out-Null
@@ -122,7 +135,7 @@ function updateRegistry {
             catch {
                 $CUSTOM_LOG.Fail("Failed to create registry path: $($i.Path)")
                 $CUSTOM_LOG.Error($Error[0])
-                Exit 1
+                return $false
             }
         }
         if ($i.Key) {
@@ -134,7 +147,7 @@ function updateRegistry {
                 catch {
                     $CUSTOM_LOG.Fail("Failed to make the following registry edit:`n - Key: $($i.Path)`n - Property: $($i.Key)`n - Value: $($i.Value)`n - Type: $($i.Type)")
                     $CUSTOM_LOG.Error($Error[0])
-                    Exit 1
+                    return $false
                 }
             }
             else {
@@ -145,17 +158,21 @@ function updateRegistry {
                 catch {
                     $CUSTOM_LOG.Fail("Failed to make the following registry edit:`n - Key: $($i.Path)`n - Property: $($i.Key)`n - Value: $($i.Value)`n - Type: $($i.Type)")
                     $CUSTOM_LOG.Error($Error[0])
-                    Exit 1
+                    return $false
                 }
             }
         }
     }
     $CUSTOM_LOG.Success("Completed registry update successfully.")
-    Exit 0
+    return $true
 }
 
 function removeRegistry {
-    foreach ($i in ($REG_DATA | Sort-Object -Property Path, Key -Descending)) {
+    param (
+        [Parameter()]
+        $data
+    )
+    foreach ($i in ($data | Sort-Object -Property Path, Key -Descending)) {
         if (Test-Path -Path $i.Path) {
             if ($i.Key) {
                 try {
@@ -165,7 +182,7 @@ function removeRegistry {
                 catch {
                     $CUSTOM_LOG.Fail("Failed to remove registy property: $($i.Key) at path: $($i.Path)")
                     $CUSTOM_LOG.Error($Error[0])
-                    Exit 1
+                    return $false
                 }
             }
             else {
@@ -176,7 +193,7 @@ function removeRegistry {
                 catch {
                     $CUSTOM_LOG.Fail("Failed to remove registy path: $($i.Path)")
                     $CUSTOM_LOG.Error($Error[0])
-                    Exit 1
+                    return $false
                 }
             }
         }
@@ -185,14 +202,22 @@ function removeRegistry {
         }
     }
     $CUSTOM_LOG.Success("Completed registry update successfully.")
-    Exit 0
+    return $true
 }
 
-function init {
-    switch ($SCRIPT_EXEC_MODE) {
-        "Update" { updateRegistry }
-        "Delete" { removeRegistry }
-        Default { updateRegistry }
+function beginRegistryUpdate {
+    param (
+        [Parameter()]
+        $data,
+        [Parameter()]
+        [ValidateSet("Update", "Delete")]
+        [string]
+        $mode
+    )
+    switch ($mode) {
+        "Update" { return updateRegistry -data $data }
+        "Delete" { return removeRegistry -data $data }
+        Default { return updateRegistry -data $data }
     }
 }
 
@@ -426,4 +451,5 @@ class CustomLog {
 Clear-Host
 sig
 checkRunIn64BitPowershell
+$CUSTOM_LOG.Information("Script PID: $PID")
 init
