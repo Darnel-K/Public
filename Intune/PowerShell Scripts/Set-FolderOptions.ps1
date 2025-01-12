@@ -3,7 +3,7 @@
 # Filename: \Intune\PowerShell Scripts\Set-FolderOptions.ps1                                                           #
 # Repository: Public                                                                                                   #
 # Created Date: Saturday, December 21st 2024, 6:43:29 PM                                                               #
-# Last Modified: Thursday, January 9th 2025, 12:18:32 AM                                                               #
+# Last Modified: Sunday, January 12th 2025, 10:37:16 PM                                                                #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 #                                                                                                                      #
@@ -41,8 +41,6 @@
 # Script functions
 
 function init {
-    # Script initialisation function. This function contains the main code and calls to other functions.
-    # This function is called automatically at the bottom of the script
     $SCRIPT_EXEC_MODE = "Update" # Update or Delete. Tells the script to either update the registry or delete the keys
     $REG_DATA = @(
         [PSCustomObject]@{
@@ -76,13 +74,12 @@ function init {
             Type  = "DWord"
         }
     )
-    if (beginRegistryUpdate -data $REG_DATA -mode $SCRIPT_EXEC_MODE) {
-        Exit 0
-    }
-    else {
+    if (-not (beginRegistryUpdate -data $REG_DATA -mode $SCRIPT_EXEC_MODE)) {
+        $CUSTOM_LOG.Fail("Unable to update registry data")
+        $CUSTOM_LOG.Error($Error)
         Exit 1
     }
-
+    Exit 0
 }
 
 #################################
@@ -109,7 +106,7 @@ function updateRegistry {
         [Parameter()]
         $data
     )
-    foreach ($i in ($reg_data | Sort-Object -Property Path)) {
+    foreach ($i in ($data | Sort-Object -Property Path)) {
         if (!(Test-Path -Path $i.Path)) {
             try {
                 New-Item -Path $i.Path -Force -ErrorAction Stop | Out-Null
@@ -155,7 +152,7 @@ function removeRegistry {
         [Parameter()]
         $data
     )
-    foreach ($i in ($reg_data | Sort-Object -Property Path, Key -Descending)) {
+    foreach ($i in ($data | Sort-Object -Property Path, Key -Descending)) {
         if (Test-Path -Path $i.Path) {
             if ($i.Key) {
                 try {
@@ -434,4 +431,5 @@ class CustomLog {
 Clear-Host
 sig
 checkRunIn64BitPowershell
+$CUSTOM_LOG.Information("Script PID: $PID")
 init
