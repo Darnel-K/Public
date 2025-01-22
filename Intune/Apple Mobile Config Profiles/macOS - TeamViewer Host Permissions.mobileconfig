@@ -68,7 +68,7 @@
 		<key>PayloadDisplayName</key>
 		<string>macOS - TeamViewer Host Permissions</string>
 		<key>PayloadIdentifier</key>
-		<string>com.abyssorguk.pppc.teamviewer-host.e482c0fd-7987-4f48-bddf-162accab1be3</string>
+		<string>com.abyssorguk.e482c0fd-7987-4f48-bddf-162accab1be3</string>
 		<key>PayloadOrganization</key>
 		<string>ABYSS.ORG.UK</string>
 		<key>PayloadRemovalDisallowed</key>
