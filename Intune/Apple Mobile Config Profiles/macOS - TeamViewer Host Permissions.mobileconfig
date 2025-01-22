@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<dict>
+		<key>PayloadContent</key>
+		<array>
+			<dict>
+				<key>PayloadDisplayName</key>
+				<string>Privacy Preferences Policy Control</string>
+				<key>PayloadIdentifier</key>
+				<string>com.apple.TCC.configuration-profile-policy.e3d946d6-2cbb-4602-8650-79374f4b688b</string>
+				<key>PayloadType</key>
+				<string>com.apple.TCC.configuration-profile-policy</string>
+				<key>PayloadUUID</key>
+				<string>e3d946d6-2cbb-4602-8650-79374f4b688b</string>
+				<key>PayloadVersion</key>
+				<integer>1</integer>
+				<key>Services</key>
+				<dict>
+					<key>Accessibility</key>
+					<array>
+						<dict>
+							<key>Allowed</key>
+							<true />
+							<key>CodeRequirement</key>
+							<string>anchor apple generic and identifier "com.teamviewer.TeamViewerHost" and (certificate leaf[field.1.2.840.113635.100.6.1.9] /* exists */ or certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = H7UGFBUGV6)</string>
+							<key>Identifier</key>
+							<string>com.teamviewer.TeamViewerHost</string>
+							<key>IdentifierType</key>
+							<string>bundleID</string>
+							<key>StaticCode</key>
+							<false />
+						</dict>
+					</array>
+					<key>ScreenCapture</key>
+					<array>
+						<dict>
+							<key>Authorization</key>
+							<string>AllowStandardUserToSetSystemService</string>
+							<key>CodeRequirement</key>
+							<string>anchor apple generic and identifier "com.teamviewer.TeamViewerHost" and (certificate leaf[field.1.2.840.113635.100.6.1.9] /* exists */ or certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = H7UGFBUGV6)</string>
+							<key>Identifier</key>
+							<string>com.teamviewer.TeamViewerHost</string>
+							<key>IdentifierType</key>
+							<string>bundleID</string>
+							<key>StaticCode</key>
+							<false />
+						</dict>
+					</array>
+					<key>SystemPolicyAllFiles</key>
+					<array>
+						<dict>
+							<key>Allowed</key>
+							<true />
+							<key>CodeRequirement</key>
+							<string>anchor apple generic and identifier "com.teamviewer.TeamViewerHost" and (certificate leaf[field.1.2.840.113635.100.6.1.9] /* exists */ or certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = H7UGFBUGV6)</string>
+							<key>Identifier</key>
+							<string>com.teamviewer.TeamViewerHost</string>
+							<key>IdentifierType</key>
+							<string>bundleID</string>
+							<key>StaticCode</key>
+							<false />
+						</dict>
+					</array>
+				</dict>
+			</dict>
+		</array>
+		<key>PayloadDisplayName</key>
+		<string>macOS - TeamViewer Host Permissions</string>
+		<key>PayloadIdentifier</key>
+		<string>com.abyssorguk.pppc.teamviewer-host</string>
+		<key>PayloadOrganization</key>
+		<string>ABYSS.ORG.UK</string>
+		<key>PayloadRemovalDisallowed</key>
+		<true />
+		<key>PayloadScope</key>
+		<string>System</string>
+		<key>PayloadType</key>
+		<string>Configuration</string>
+		<key>PayloadUUID</key>
+		<string>e482c0fd-7987-4f48-bddf-162accab1be3</string>
+		<key>PayloadVersion</key>
+		<integer>1</integer>
+	</dict>
+</plist>
