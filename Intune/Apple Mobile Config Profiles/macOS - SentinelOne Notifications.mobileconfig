@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<dict>
+		<key>PayloadContent</key>
+		<array>
+			<dict>
+				<key>NotificationSettings</key>
+				<array>
+					<dict>
+						<key>BadgesEnabled</key>
+						<true />
+						<key>BundleIdentifier</key>
+						<string>com.sentinelone.SentinelAgent</string>
+						<key>CriticalAlertEnabled</key>
+						<true />
+						<key>GroupingType</key>
+						<integer>0</integer>
+						<key>NotificationsEnabled</key>
+						<true />
+						<key>PreviewType</key>
+						<integer>1</integer>
+						<key>ShowInCarPlay</key>
+						<true />
+						<key>ShowInLockScreen</key>
+						<true />
+						<key>ShowInNotificationCenter</key>
+						<true />
+						<key>SoundsEnabled</key>
+						<true />
+					</dict>
+				</array>
+				<key>PayloadDisplayName</key>
+				<string>Notifications #1</string>
+				<key>PayloadIdentifier</key>
+				<string>com.apple.notificationsettings.3aafbbe4-c35d-4121-8b87-cfc1866f7e28</string>
+				<key>PayloadType</key>
+				<string>com.apple.notificationsettings</string>
+				<key>PayloadUUID</key>
+				<string>3aafbbe4-c35d-4121-8b87-cfc1866f7e28</string>
+				<key>PayloadVersion</key>
+				<integer>1</integer>
+			</dict>
+		</array>
+		<key>PayloadDisplayName</key>
+		<string>macOS - SentinelOne Notifications</string>
+		<key>PayloadIdentifier</key>
+		<string>com.abyssorguk.39bc0654-3c7b-4ae5-b86c-caa3b78ed2ad</string>
+		<key>PayloadOrganization</key>
+		<string>ABYSS.ORG.UK</string>
+		<key>PayloadRemovalDisallowed</key>
+		<true />
+		<key>PayloadScope</key>
+		<string>System</string>
+		<key>PayloadType</key>
+		<string>Configuration</string>
+		<key>PayloadUUID</key>
+		<string>39bc0654-3c7b-4ae5-b86c-caa3b78ed2ad</string>
+		<key>PayloadVersion</key>
+		<integer>1</integer>
+	</dict>
+</plist>
