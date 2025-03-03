@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<dict>
+		<key>PayloadContent</key>
+		<array>
+			<dict>
+				<key>FilterDataProviderBundleIdentifier</key>
+				<string>com.sentinelone.network-monitoring</string>
+				<key>FilterDataProviderDesignatedRequirement</key>
+				<string>anchor apple generic and identifier "com.sentinelone.network-monitoring" and (certificate leaf[field.1.2.840.113635.100.6.1.9] or certificate 1[field.1.2.840.113635.100.6.2.6] and certificate leaf[field.1.2.840.113635.100.6.1.13] and certificate leaf[subject.OU] = "4AYE5J54KN")</string>
+				<key>FilterPackets</key>
+				<true />
+				<key>FilterType</key>
+				<string>Plugin</string>
+				<key>PayloadDisplayName</key>
+				<string>Web Content Filter #1</string>
+				<key>PayloadIdentifier</key>
+				<string>com.apple.webcontent-filter.8309b291-70e0-4961-a76f-5629fdac73a4</string>
+				<key>PayloadType</key>
+				<string>com.apple.webcontent-filter</string>
+				<key>PayloadUUID</key>
+				<string>8309b291-70e0-4961-a76f-5629fdac73a4</string>
+				<key>PayloadVersion</key>
+				<integer>1</integer>
+				<key>PluginBundleID</key>
+				<string>com.sentinelone.extensions-wrapper</string>
+				<key>UserDefinedName</key>
+				<string>SentinelOne Network Filter</string>
+			</dict>
+		</array>
+		<key>PayloadDisplayName</key>
+		<string>macOS - SentinelOne Network Filter</string>
+		<key>PayloadIdentifier</key>
+		<string>com.abyssorguk.82caef8a-e22d-4552-8542-5c7dac61ec7c</string>
+		<key>PayloadOrganization</key>
+		<string>ABYSS.ORG.UK</string>
+		<key>PayloadRemovalDisallowed</key>
+		<true />
+		<key>PayloadScope</key>
+		<string>System</string>
+		<key>PayloadType</key>
+		<string>Configuration</string>
+		<key>PayloadUUID</key>
+		<string>82caef8a-e22d-4552-8542-5c7dac61ec7c</string>
+		<key>PayloadVersion</key>
+		<integer>1</integer>
+	</dict>
+</plist>
