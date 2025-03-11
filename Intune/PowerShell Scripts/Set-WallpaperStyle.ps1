@@ -2,8 +2,8 @@
 # #################################################################################################################### #
 # Filename: \Intune\PowerShell Scripts\Set-WallpaperStyle.ps1                                                          #
 # Repository: Public                                                                                                   #
-# Created Date: Saturday, December 21st 2024, 6:43:29 PM                                                               #
-# Last Modified: Sunday, January 12th 2025, 10:38:01 PM                                                                #
+# Created Date: Monday, February 3rd 2025, 11:38:51 PM                                                                 #
+# Last Modified: Monday, March 10th 2025, 2:52:10 PM                                                                   #
 # Original Author: Darnel Kumar                                                                                        #
 # Author Github: https://github.com/Darnel-K                                                                           #
 #                                                                                                                      #
@@ -41,7 +41,7 @@ function init {
         [PSCustomObject]@{
             Path  = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Policies\System"
             Key   = "WallpaperStyle"
-            Value = "3"
+            Value = "3" # 0 = Center, 1 = Tile, 2 = Stretch, 3 = Fit, 4 = Fill, 5 = Span
             Type  = "STRING"
         }
     )
