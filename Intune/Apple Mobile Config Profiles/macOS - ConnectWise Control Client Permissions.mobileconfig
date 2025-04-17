@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<dict>
+		<key>PayloadContent</key>
+		<array>
+			<dict>
+				<key>PayloadDisplayName</key>
+				<string>Privacy Preferences Policy Control #1</string>
+				<key>PayloadIdentifier</key>
+				<string>com.apple.TCC.configuration-profile-policy.0818ae39-6dcb-41be-a670-5eb21b163b57</string>
+				<key>PayloadType</key>
+				<string>com.apple.TCC.configuration-profile-policy</string>
+				<key>PayloadUUID</key>
+				<string>0818ae39-6dcb-41be-a670-5eb21b163b57</string>
+				<key>PayloadVersion</key>
+				<integer>1</integer>
+				<key>Services</key>
+				<dict>
+					<key>Accessibility</key>
+					<array>
+						<dict>
+							<key>Allowed</key>
+							<true />
+							<key>CodeRequirement</key>
+							<string>identifier "com.screenconnect.client.access" and anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = K8M3XDZV9Y</string>
+							<key>Identifier</key>
+							<string>com.screenconnect.client.access</string>
+							<key>IdentifierType</key>
+							<string>bundleID</string>
+							<key>StaticCode</key>
+							<false />
+						</dict>
+					</array>
+					<key>ScreenCapture</key>
+					<array>
+						<dict>
+							<key>Authorization</key>
+							<string>AllowStandardUserToSetSystemService</string>
+							<key>CodeRequirement</key>
+							<string>identifier "com.screenconnect.client.access" and anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = K8M3XDZV9Y</string>
+							<key>Identifier</key>
+							<string>com.screenconnect.client.access</string>
+							<key>IdentifierType</key>
+							<string>bundleID</string>
+							<key>StaticCode</key>
+							<false />
+						</dict>
+					</array>
+					<key>SystemPolicyAllFiles</key>
+					<array>
+						<dict>
+							<key>Allowed</key>
+							<true />
+							<key>CodeRequirement</key>
+							<string>identifier "com.screenconnect.client.access" and anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = K8M3XDZV9Y</string>
+							<key>Identifier</key>
+							<string>com.screenconnect.client.access</string>
+							<key>IdentifierType</key>
+							<string>bundleID</string>
+							<key>StaticCode</key>
+							<false />
+						</dict>
+					</array>
+				</dict>
+			</dict>
+		</array>
+		<key>PayloadDisplayName</key>
+		<string>macOS - ConnectWise Control Client Permissions</string>
+		<key>PayloadIdentifier</key>
+		<string>com.abyssorguk.411c546d-d617-49c1-aa7a-0c9be197c7bd</string>
+		<key>PayloadOrganization</key>
+		<string>ABYSS.ORG.UK</string>
+		<key>PayloadRemovalDisallowed</key>
+		<true />
+		<key>PayloadScope</key>
+		<string>System</string>
+		<key>PayloadType</key>
+		<string>Configuration</string>
+		<key>PayloadUUID</key>
+		<string>411c546d-d617-49c1-aa7a-0c9be197c7bd</string>
+		<key>PayloadVersion</key>
+		<integer>1</integer>
+	</dict>
+</plist>
